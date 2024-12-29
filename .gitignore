@@ -1,0 +1,24 @@
+# Binaries
+*.dcu
+*.bak
+
+# Temporary files
+*.tmp
+*.~*
+
+# Directories
+FPGA/db/
+FPGA/greybox_tmp/
+FPGA/incremental_db/
+FPGA/output_files/
+FPGA/*sim/
+FPGA/*testbench/
+build/
+PCB/History/
+PCB/Project Logs for AES50/
+PCB/Project Outputs for AES50/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Rr]eleases/

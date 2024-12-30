@@ -26,8 +26,8 @@ applicable agreement for further details.
 	(port
 		(pt 0 32)
 		(input)
-		(text "enable" (rect 0 0 24 12)(font "Arial" ))
-		(text "enable" (rect 21 27 45 39)(font "Arial" ))
+		(text "rx_clk" (rect 0 0 24 12)(font "Arial" ))
+		(text "rx_clk" (rect 21 27 45 39)(font "Arial" ))
 		(line (pt 0 32)(pt 16 32)(line_width 1))
 	)
 	(port
@@ -47,23 +47,16 @@ applicable agreement for further details.
 	(port
 		(pt 0 80)
 		(input)
-		(text "write" (rect 0 0 17 12)(font "Arial" ))
-		(text "write" (rect 21 75 38 87)(font "Arial" ))
-		(line (pt 0 80)(pt 16 80)(line_width 1))
+		(text "readAddr[10..0]" (rect 0 0 62 12)(font "Arial" ))
+		(text "readAddr[10..0]" (rect 21 75 83 87)(font "Arial" ))
+		(line (pt 0 80)(pt 16 80)(line_width 3))
 	)
 	(port
 		(pt 0 96)
 		(input)
-		(text "readAddr[10..0]" (rect 0 0 62 12)(font "Arial" ))
-		(text "readAddr[10..0]" (rect 21 91 83 103)(font "Arial" ))
-		(line (pt 0 96)(pt 16 96)(line_width 3))
-	)
-	(port
-		(pt 0 112)
-		(input)
 		(text "readDbgAddr[10..0]" (rect 0 0 79 12)(font "Arial" ))
-		(text "readDbgAddr[10..0]" (rect 21 107 100 119)(font "Arial" ))
-		(line (pt 0 112)(pt 16 112)(line_width 3))
+		(text "readDbgAddr[10..0]" (rect 21 91 100 103)(font "Arial" ))
+		(line (pt 0 96)(pt 16 96)(line_width 3))
 	)
 	(port
 		(pt 248 32)

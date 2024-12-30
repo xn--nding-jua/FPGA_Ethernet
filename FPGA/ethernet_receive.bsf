@@ -26,8 +26,8 @@ applicable agreement for further details.
 	(port
 		(pt 0 32)
 		(input)
-		(text "clk" (rect 0 0 10 12)(font "Arial" ))
-		(text "clk" (rect 21 27 31 39)(font "Arial" ))
+		(text "rx_clk" (rect 0 0 24 12)(font "Arial" ))
+		(text "rx_clk" (rect 21 27 45 39)(font "Arial" ))
 		(line (pt 0 32)(pt 16 32)(line_width 1))
 	)
 	(port
@@ -47,8 +47,8 @@ applicable agreement for further details.
 	(port
 		(pt 0 80)
 		(input)
-		(text "rx_err[5..0]" (rect 0 0 46 12)(font "Arial" ))
-		(text "rx_err[5..0]" (rect 21 75 67 87)(font "Arial" ))
+		(text "rx_err[4..0]" (rect 0 0 47 12)(font "Arial" ))
+		(text "rx_err[4..0]" (rect 21 75 68 87)(font "Arial" ))
 		(line (pt 0 80)(pt 16 80)(line_width 3))
 	)
 	(port
@@ -82,23 +82,9 @@ applicable agreement for further details.
 	(port
 		(pt 216 64)
 		(output)
-		(text "ram_write" (rect 0 0 40 12)(font "Arial" ))
-		(text "ram_write" (rect 155 59 195 71)(font "Arial" ))
-		(line (pt 216 64)(pt 200 64)(line_width 1))
-	)
-	(port
-		(pt 216 80)
-		(output)
-		(text "rx_clock" (rect 0 0 34 12)(font "Arial" ))
-		(text "rx_clock" (rect 161 75 195 87)(font "Arial" ))
-		(line (pt 216 80)(pt 200 80)(line_width 1))
-	)
-	(port
-		(pt 216 96)
-		(output)
 		(text "rx_rdy" (rect 0 0 28 12)(font "Arial" ))
-		(text "rx_rdy" (rect 167 91 195 103)(font "Arial" ))
-		(line (pt 216 96)(pt 200 96)(line_width 1))
+		(text "rx_rdy" (rect 167 59 195 71)(font "Arial" ))
+		(line (pt 216 64)(pt 200 64)(line_width 1))
 	)
 	(drawing
 		(rectangle (rect 16 16 200 128)(line_width 1))

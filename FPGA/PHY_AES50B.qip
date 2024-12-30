@@ -6,7 +6,10 @@ set_global_assignment -name SYNTHESIS_ONLY_QIP ON
 
 set_global_assignment -library "PHY_AES50B" -name VHDL_FILE [file join $::quartus(qip_path) "PHY_AES50B.vhd"]
 set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/PHY_AES50B_0002.v"]
-set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_eth_tse_mac.v"]
+set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_reset_controller.v"]
+set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_reset_synchronizer.v"]
+set_global_assignment -library "PHY_AES50B" -name SDC_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_reset_controller.sdc"]
+set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_eth_tse_fifoless_mac.v"]
 set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_tse_clk_cntl.v"]
 set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_tse_crc328checker.v"]
 set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_tse_crc328generator.v"]
@@ -97,11 +100,22 @@ set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::qua
 set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_tse_dc_fifo.v"]
 set_global_assignment -library "PHY_AES50B" -name SOURCE_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_tse_top_wo_fifo_10_100_1000.ocp"]
 set_global_assignment -library "PHY_AES50B" -name SOURCE_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_tse_top_w_fifo_10_100_1000.ocp"]
-set_global_assignment -library "PHY_AES50B" -name SDC_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_eth_tse_mac.sdc"]
+set_global_assignment -library "PHY_AES50B" -name SDC_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_eth_tse_fifoless_mac.sdc"]
+set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_eth_tse_channel_adapter.v"]
+set_global_assignment -library "PHY_AES50B" -name VERILOG_FILE [file join $::quartus(qip_path) "PHY_AES50B/altera_eth_tse_avalon_arbiter.v"]
 
 set_global_assignment -entity "PHY_AES50B_0002" -library "PHY_AES50B" -name IP_TOOL_NAME "altera_eth_tse"
 set_global_assignment -entity "PHY_AES50B_0002" -library "PHY_AES50B" -name IP_TOOL_VERSION "13.1"
 set_global_assignment -entity "PHY_AES50B_0002" -library "PHY_AES50B" -name IP_TOOL_ENV "mwpim"
-set_global_assignment -entity "altera_eth_tse_mac" -library "PHY_AES50B" -name IP_TOOL_NAME "altera_eth_tse_mac"
-set_global_assignment -entity "altera_eth_tse_mac" -library "PHY_AES50B" -name IP_TOOL_VERSION "13.1"
-set_global_assignment -entity "altera_eth_tse_mac" -library "PHY_AES50B" -name IP_TOOL_ENV "mwpim"
+set_global_assignment -entity "altera_reset_controller" -library "PHY_AES50B" -name IP_TOOL_NAME "altera_reset_controller"
+set_global_assignment -entity "altera_reset_controller" -library "PHY_AES50B" -name IP_TOOL_VERSION "13.1"
+set_global_assignment -entity "altera_reset_controller" -library "PHY_AES50B" -name IP_TOOL_ENV "mwpim"
+set_global_assignment -entity "altera_eth_tse_fifoless_mac" -library "PHY_AES50B" -name IP_TOOL_NAME "altera_eth_tse_fifoless_mac"
+set_global_assignment -entity "altera_eth_tse_fifoless_mac" -library "PHY_AES50B" -name IP_TOOL_VERSION "13.1"
+set_global_assignment -entity "altera_eth_tse_fifoless_mac" -library "PHY_AES50B" -name IP_TOOL_ENV "mwpim"
+set_global_assignment -entity "altera_eth_tse_channel_adapter" -library "PHY_AES50B" -name IP_TOOL_NAME "altera_eth_tse_channel_adapter"
+set_global_assignment -entity "altera_eth_tse_channel_adapter" -library "PHY_AES50B" -name IP_TOOL_VERSION "13.1"
+set_global_assignment -entity "altera_eth_tse_channel_adapter" -library "PHY_AES50B" -name IP_TOOL_ENV "mwpim"
+set_global_assignment -entity "altera_eth_tse_avalon_arbiter" -library "PHY_AES50B" -name IP_TOOL_NAME "altera_eth_tse_avalon_arbiter"
+set_global_assignment -entity "altera_eth_tse_avalon_arbiter" -library "PHY_AES50B" -name IP_TOOL_VERSION "13.1"
+set_global_assignment -entity "altera_eth_tse_avalon_arbiter" -library "PHY_AES50B" -name IP_TOOL_ENV "mwpim"

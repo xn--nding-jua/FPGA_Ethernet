@@ -2,7 +2,7 @@
 -- (c) 2024 Dr.-Ing. Christian Noeding
 -- christian@noeding-online.de
 -- Released under GNU General Public License v3
--- Source: https://www.github.com/xn--nding-jua/X-FBAPE
+-- Source: https://www.github.com/xn--nding-jua/AES50_Transmitter
 --
 -- This file contains a RAM-module with asynchronuous read/write
 -- from/to the DMX512-data. It stores 512 bytes plus start-byte.
@@ -16,11 +16,10 @@ entity aes50_ram is
 		lastAddress : integer := 1531
 	);
 	port(
-		enable		: in std_logic;
+		rx_clk		: in std_logic;
 		
 		writeAddr	: in unsigned(10 downto 0); -- 0..1531
 		data_in		: in unsigned(7 downto 0); -- 8 bit
-		write			: in std_logic;
 
 		readAddr		: in unsigned(10 downto 0); -- 0..1531
 		data_out		: out unsigned(7 downto 0); -- 8 bit
@@ -35,12 +34,10 @@ architecture behav of aes50_ram is
 	signal tmp_ram: ram_type;
 begin
 	-- writing data to ram
-	process(write)
+	process(rx_clk)
 	begin
-		if rising_edge(write) then
-			if (enable = '1') then
-				tmp_ram(to_integer(writeAddr)) <= data_in;
-			end if;
+		if rising_edge(rx_clk) then
+			tmp_ram(to_integer(writeAddr)) <= data_in;
 		end if;
 	end process;
 

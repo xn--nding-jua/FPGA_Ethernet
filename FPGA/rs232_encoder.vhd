@@ -2,7 +2,7 @@
 -- (c) 2023 Dr.-Ing. Christian Noeding
 -- christian@noeding-online.de
 -- Released under GNU General Public License v3
--- Source: https://www.github.com/xn--nding-jua/Audioplayer
+-- Source: https://www.github.com/xn--nding-jua/AES50_Transmitter
 --
 -- This file contains a RS232 data-encoder to transmit individual bytes via a rs232-transmitter
 -- It is like a signal multiplexer, that will prepare multiple bytes for a serial-transmitter

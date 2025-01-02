@@ -4,7 +4,7 @@ editor if you plan to continue editing the block that represents it in
 the Block Editor! File corruption is VERY likely to occur.
 */
 /*
-Copyright (C) 1991-2014 Altera Corporation
+Copyright (C) 1991-2013 Altera Corporation
 Your use of Altera Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
@@ -20,9 +20,9 @@ applicable agreement for further details.
 */
 (header "symbol" (version "1.1"))
 (symbol
-	(rect 16 16 232 160)
+	(rect 16 16 256 128)
 	(text "ethernet_receive" (rect 5 0 72 12)(font "Arial" ))
-	(text "inst" (rect 8 128 20 140)(font "Arial" ))
+	(text "inst" (rect 8 96 20 108)(font "Arial" ))
 	(port
 		(pt 0 32)
 		(input)
@@ -33,60 +33,46 @@ applicable agreement for further details.
 	(port
 		(pt 0 48)
 		(input)
-		(text "rx_data[7..0]" (rect 0 0 50 12)(font "Arial" ))
-		(text "rx_data[7..0]" (rect 21 43 71 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48)(line_width 3))
+		(text "rx_frame" (rect 0 0 38 12)(font "Arial" ))
+		(text "rx_frame" (rect 21 43 59 55)(font "Arial" ))
+		(line (pt 0 48)(pt 16 48)(line_width 1))
 	)
 	(port
 		(pt 0 64)
 		(input)
-		(text "rx_eop" (rect 0 0 28 12)(font "Arial" ))
-		(text "rx_eop" (rect 21 59 49 71)(font "Arial" ))
-		(line (pt 0 64)(pt 16 64)(line_width 1))
+		(text "rx_data[7..0]" (rect 0 0 50 12)(font "Arial" ))
+		(text "rx_data[7..0]" (rect 21 59 71 71)(font "Arial" ))
+		(line (pt 0 64)(pt 16 64)(line_width 3))
 	)
 	(port
 		(pt 0 80)
 		(input)
-		(text "rx_err[4..0]" (rect 0 0 47 12)(font "Arial" ))
-		(text "rx_err[4..0]" (rect 21 75 68 87)(font "Arial" ))
-		(line (pt 0 80)(pt 16 80)(line_width 3))
+		(text "rx_byte_received" (rect 0 0 71 12)(font "Arial" ))
+		(text "rx_byte_received" (rect 21 75 92 87)(font "Arial" ))
+		(line (pt 0 80)(pt 16 80)(line_width 1))
 	)
 	(port
-		(pt 0 96)
-		(input)
-		(text "rx_sop" (rect 0 0 28 12)(font "Arial" ))
-		(text "rx_sop" (rect 21 91 49 103)(font "Arial" ))
-		(line (pt 0 96)(pt 16 96)(line_width 1))
-	)
-	(port
-		(pt 0 112)
-		(input)
-		(text "rx_valid" (rect 0 0 31 12)(font "Arial" ))
-		(text "rx_valid" (rect 21 107 52 119)(font "Arial" ))
-		(line (pt 0 112)(pt 16 112)(line_width 1))
-	)
-	(port
-		(pt 216 32)
+		(pt 240 32)
 		(output)
 		(text "ram_addr[10..0]" (rect 0 0 63 12)(font "Arial" ))
-		(text "ram_addr[10..0]" (rect 132 27 195 39)(font "Arial" ))
-		(line (pt 216 32)(pt 200 32)(line_width 3))
+		(text "ram_addr[10..0]" (rect 156 27 219 39)(font "Arial" ))
+		(line (pt 240 32)(pt 224 32)(line_width 3))
 	)
 	(port
-		(pt 216 48)
+		(pt 240 48)
 		(output)
 		(text "ram_data[7..0]" (rect 0 0 59 12)(font "Arial" ))
-		(text "ram_data[7..0]" (rect 136 43 195 55)(font "Arial" ))
-		(line (pt 216 48)(pt 200 48)(line_width 3))
+		(text "ram_data[7..0]" (rect 160 43 219 55)(font "Arial" ))
+		(line (pt 240 48)(pt 224 48)(line_width 3))
 	)
 	(port
-		(pt 216 64)
+		(pt 240 64)
 		(output)
-		(text "rx_rdy" (rect 0 0 28 12)(font "Arial" ))
-		(text "rx_rdy" (rect 167 59 195 71)(font "Arial" ))
-		(line (pt 216 64)(pt 200 64)(line_width 1))
+		(text "frame_rdy" (rect 0 0 44 12)(font "Arial" ))
+		(text "frame_rdy" (rect 175 59 219 71)(font "Arial" ))
+		(line (pt 240 64)(pt 224 64)(line_width 1))
 	)
 	(drawing
-		(rectangle (rect 16 16 200 128)(line_width 1))
+		(rectangle (rect 16 16 224 96)(line_width 1))
 	)
 )

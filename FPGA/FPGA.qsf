@@ -235,20 +235,36 @@ set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_RO
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_location_assignment PIN_G22 -to P5_LVDS_IN3N_IN
 set_location_assignment PIN_G21 -to P5_LVDS_IN3P_IN
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PHY_MDIO
+set_location_assignment PIN_AB12 -to CLK25B2
+set_global_assignment -name VHDL_FILE ethernet_mac/utility.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/single_signal_synchronizer.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/reset_generator.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/miim_types.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/miim_registers.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/miim_control.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/miim.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/mii_gmii_io.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/mii_gmii.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/framing_common.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/framing.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/ethernet_types.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/ethernet.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/crc32_tb.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/crc32.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/crc.vhd
 set_global_assignment -name VHDL_FILE ethernet_control.vhd
 set_global_assignment -name VHDL_FILE uart_tx.vhd
 set_global_assignment -name VHDL_FILE uart_rx.vhd
 set_global_assignment -name VHDL_FILE rs232_encoder.vhd
 set_global_assignment -name VHDL_FILE RS232_Decoder.vhdl
 set_global_assignment -name BDF_FILE FPGA.bdf
-set_global_assignment -name QIP_FILE PHY_AES50B.qip
-set_global_assignment -name SIP_FILE PHY_AES50B.sip
 set_global_assignment -name QIP_FILE PLL2.qip
 set_global_assignment -name VHDL_FILE ethernet_send.vhd
 set_global_assignment -name VHDL_FILE ethernet_receive.vhd
 set_global_assignment -name VHDL_FILE aes50_ram.vhd
 set_global_assignment -name VHDL_FILE ethernet_reset.vhd
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PHY_MDIO
-set_location_assignment PIN_AB12 -to CLK25B2
 set_global_assignment -name VHDL_FILE detect_rising_edge.vhd
+set_global_assignment -name QIP_FILE const_ethspeed.qip
+set_global_assignment -name QIP_FILE const_ethmacid0.qip
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

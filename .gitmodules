@@ -1,0 +1,3 @@
+[submodule "FPGA/ethernet_mac"]
+	path = FPGA/ethernet_mac
+	url = https://github.com/yol/ethernet_mac.git

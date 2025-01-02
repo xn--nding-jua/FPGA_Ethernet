@@ -4,7 +4,7 @@ editor if you plan to continue editing the block that represents it in
 the Block Editor! File corruption is VERY likely to occur.
 */
 /*
-Copyright (C) 1991-2014 Altera Corporation
+Copyright (C) 1991-2013 Altera Corporation
 Your use of Altera Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
@@ -20,9 +20,9 @@ applicable agreement for further details.
 */
 (header "symbol" (version "1.1"))
 (symbol
-	(rect 16 16 248 160)
+	(rect 16 16 248 192)
 	(text "ethernet_control" (rect 5 0 68 12)(font "Arial" ))
-	(text "inst" (rect 8 128 20 140)(font "Arial" ))
+	(text "inst" (rect 8 160 20 172)(font "Arial" ))
 	(port
 		(pt 0 32)
 		(input)
@@ -54,9 +54,9 @@ applicable agreement for further details.
 	(port
 		(pt 232 32)
 		(output)
-		(text "read" (rect 0 0 17 12)(font "Arial" ))
-		(text "read" (rect 194 27 211 39)(font "Arial" ))
-		(line (pt 232 32)(pt 216 32)(line_width 1))
+		(text "address[11..0]" (rect 0 0 54 12)(font "Arial" ))
+		(text "address[11..0]" (rect 157 27 211 39)(font "Arial" ))
+		(line (pt 232 32)(pt 216 32)(line_width 3))
 	)
 	(port
 		(pt 232 48)
@@ -68,25 +68,39 @@ applicable agreement for further details.
 	(port
 		(pt 232 64)
 		(output)
-		(text "write" (rect 0 0 17 12)(font "Arial" ))
-		(text "write" (rect 194 59 211 71)(font "Arial" ))
-		(line (pt 232 64)(pt 216 64)(line_width 1))
+		(text "byte_en[3..0]" (rect 0 0 53 12)(font "Arial" ))
+		(text "byte_en[3..0]" (rect 158 59 211 71)(font "Arial" ))
+		(line (pt 232 64)(pt 216 64)(line_width 3))
 	)
 	(port
 		(pt 232 80)
 		(output)
-		(text "address[7..0]" (rect 0 0 51 12)(font "Arial" ))
-		(text "address[7..0]" (rect 160 75 211 87)(font "Arial" ))
-		(line (pt 232 80)(pt 216 80)(line_width 3))
+		(text "cs" (rect 0 0 9 12)(font "Arial" ))
+		(text "cs" (rect 202 75 211 87)(font "Arial" ))
+		(line (pt 232 80)(pt 216 80)(line_width 1))
 	)
 	(port
 		(pt 232 96)
 		(output)
+		(text "read" (rect 0 0 17 12)(font "Arial" ))
+		(text "read" (rect 194 91 211 103)(font "Arial" ))
+		(line (pt 232 96)(pt 216 96)(line_width 1))
+	)
+	(port
+		(pt 232 112)
+		(output)
+		(text "write" (rect 0 0 17 12)(font "Arial" ))
+		(text "write" (rect 194 107 211 119)(font "Arial" ))
+		(line (pt 232 112)(pt 216 112)(line_width 1))
+	)
+	(port
+		(pt 232 128)
+		(output)
 		(text "rev[31..0]" (rect 0 0 37 12)(font "Arial" ))
-		(text "rev[31..0]" (rect 174 91 211 103)(font "Arial" ))
-		(line (pt 232 96)(pt 216 96)(line_width 3))
+		(text "rev[31..0]" (rect 174 123 211 135)(font "Arial" ))
+		(line (pt 232 128)(pt 216 128)(line_width 3))
 	)
 	(drawing
-		(rectangle (rect 16 16 216 128)(line_width 1))
+		(rectangle (rect 16 16 216 160)(line_width 1))
 	)
 )

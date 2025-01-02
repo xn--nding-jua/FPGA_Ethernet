@@ -20,12 +20,9 @@ entity ethernet_send is
 		ramData		: in std_logic_vector(7 downto 0);
 
 		ramAddr		: out unsigned(10 downto 0);
-		tx_data		: out std_logic_vector(7 downto 0); -- data-octet
-		tx_eop		: out std_logic; -- EndOfPacket
-		tx_err		: out std_logic; -- Error
-		tx_sop		: out std_logic; -- StartOfPacket
+		tx_data		: out std_logic_vector(31 downto 0); -- 32-bit-data
 		tx_valid		: out std_logic;  -- TX valid
-		tx_crc_fwd	: out std_logic  -- crc calculation
+		tx_waitrqst : out std_logic
 	);
 end entity;
 
@@ -34,7 +31,7 @@ architecture Behavioral of ethernet_send is
 	constant MAC_HEADER_LENGTH  : integer := 14;
 	constant IP_HEADER_LENGTH  : integer := 5 * (32 / 8); -- Header length always 20 bytes (5 * 32 bit words)
 	constant UDP_HEADER_LENGTH  : integer := 8;
-	constant PAYLOAD_LENGTH  : integer := 12;
+	constant PAYLOAD_LENGTH  : integer := 14;
 	constant PACKET_LENGTH  : integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + PAYLOAD_LENGTH;
 
 	-- Functions
@@ -110,11 +107,11 @@ architecture Behavioral of ethernet_send is
 		x"0f", -- destination port (= 4023)
 		x"b7",
 		x"00", -- length (length of this UDP packet including header and data. Minimum 8 bytes)
-		x"1a",
-		x"d5", -- checksum
-		x"d1",
+		x"16",
+		x"00", -- checksum
+		x"00",
 		
-		-- UDP PAYLOAD (12 bytes)
+		-- UDP PAYLOAD (14 bytes)
 		x"48", -- Payload 0...1500 bytes HELLO WORLD!
 		x"45",
 		x"4c",
@@ -126,9 +123,9 @@ architecture Behavioral of ethernet_send is
 		x"52",
 		x"4c",
 		x"44",
-		x"21"
-		
-		-- TODO: Find the reason for 6 additional 0-bytes are attached to the frame
+		x"21",
+		x"00", -- fill up to 32-bit
+		x"00" -- fill up to 32-bit
 		
 		-- 4 CRC32 bytes will be added by the Ethernet-MAC
 	);
@@ -140,54 +137,41 @@ begin
 			if ((tx_start = '1') and (s_SM_Ethernet = s_Idle)) then
 				-- prepare begin of packet
 				packet_counter <= packet_counter + 1; -- increment packet counter
-				tx_err <= '0';
-				tx_sop <= '0';
 				tx_valid <= '0';
-				tx_crc_fwd <= '0';
+				tx_waitrqst <= '0';
 				byte_counter <= 0;
-				tx_data <= ethernet_frame(0);
+				tx_data <= ethernet_frame(3) & ethernet_frame(2) & ethernet_frame(1) & ethernet_frame(0);
 				
 				s_SM_Ethernet <= s_Start;
 			elsif (s_SM_Ethernet = s_Start) then
-				tx_sop <= '1';
 				tx_valid <= '1';
-				tx_data <= ethernet_frame(0);
+				byte_counter <= 4;
+				tx_data <= ethernet_frame(3) & ethernet_frame(2) & ethernet_frame(1) & ethernet_frame(0);
 				
 				-- insert packet_counter to frame
 				ethernet_frame(MAC_HEADER_LENGTH + 4) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8);
 				ethernet_frame(MAC_HEADER_LENGTH + 5) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);
 				calc_new_checksum <= '1'; -- calculate new checksum
 
-				s_SM_Ethernet <= s_Wait;
+				s_SM_Ethernet <= s_Transmit;
 			
-			elsif (s_SM_Ethernet = s_Wait) then
-				if (tx_rdy = '1') then
-					-- the MAC is ready to read our data
-					tx_sop <= '0';
-					tx_data <= ethernet_frame(1);
-					byte_counter <= 3; -- preload for byte 1 again (byte_counter/2, so 3/2 = 1!)
-
-					s_SM_Ethernet <= s_Transmit;
-				end if;
 			elsif (s_SM_Ethernet = s_Transmit) then
 				-- send next byte and increment byte_counter
-				tx_data <= ethernet_frame(byte_counter / 2);
+				tx_data <= ethernet_frame(byte_counter + 3) & ethernet_frame(byte_counter + 2) & ethernet_frame(byte_counter + 1) & ethernet_frame(byte_counter);
 				
-				if (byte_counter = PACKET_LENGTH + PACKET_LENGTH - 1) then
+				if (byte_counter = PACKET_LENGTH - 1) then
 					-- stop transmitting
 					s_SM_Ethernet <= s_End;
-					tx_eop <= '1';
-				elsif (byte_counter = MAC_HEADER_LENGTH + 8) then
+				elsif (byte_counter >= MAC_HEADER_LENGTH + 8) then
 					-- insert CRC checksum into header, when byte_counter is 2 bytes before CRC
 					ethernet_frame(MAC_HEADER_LENGTH + 10) <= std_logic_vector(checksum(15 downto 8)); -- MSB
 					ethernet_frame(MAC_HEADER_LENGTH + 11) <= std_logic_vector(checksum(7 downto 0)); -- LSB
 				end if;
 
-				byte_counter <= byte_counter + 1;
+				byte_counter <= byte_counter + 4;
 				
 			elsif (s_SM_Ethernet = s_End) then
 				if (tx_rdy = '0') then
-					tx_eop <= '0';
 					tx_valid <= '0';
 					calc_new_checksum <= '0';
 

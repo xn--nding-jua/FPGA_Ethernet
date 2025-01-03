@@ -14,7 +14,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity ethernet_send is 
 	port
 	(
-		tx_start			: in std_logic;
+		frame_start			: in std_logic;
 		tx_clk			: in std_logic;
 		tx_busy			: in std_logic;
 		tx_byte_sent	: in std_logic;
@@ -132,7 +132,7 @@ begin
 	process (tx_clk)
 	begin
 		if (falling_edge(tx_clk)) then
-			if ((tx_start = '1') and (s_SM_Ethernet = s_Idle)) then
+			if ((frame_start = '1') and (s_SM_Ethernet = s_Idle)) then
 				-- prepare begin of packet
 				packet_counter <= packet_counter + 1; -- increment packet counter
 				tx_enable <= '0';
@@ -142,10 +142,10 @@ begin
 				s_SM_Ethernet <= s_Start;
 				
 			elsif (s_SM_Ethernet = s_Start) then
-				-- wait until MAC is ready
+				-- wait until MAC is ready again
 				if (tx_busy = '0') then
 					tx_enable <= '1';
-					byte_counter <= 1; -- preload to second byte
+					byte_counter <= 0; -- preload to first byte again
 					tx_data <= ethernet_frame(0);
 					
 					-- insert packet_counter to frame

@@ -29,19 +29,19 @@ entity aes50_ram is
 	);
 end aes50_ram;
 
-architecture behav of aes50_ram is
-	type ram_type is array(lastAddress downto 0) of unsigned(7 downto 0);
-	signal tmp_ram: ram_type;
+architecture Behavioral of aes50_ram is
+	type t_ram is array(lastAddress downto 0) of unsigned(7 downto 0);
+	signal ram: t_ram;
 begin
 	-- writing data to ram
 	process(rx_clk)
 	begin
 		if rising_edge(rx_clk) then
-			tmp_ram(to_integer(writeAddr)) <= data_in;
+			ram(to_integer(writeAddr)) <= data_in;
 		end if;
 	end process;
 
 	-- continuously outputting data at specified address
-	data_out <= tmp_ram(to_integer(readAddr));
-	dataDbg_out <= tmp_ram(to_integer(readDbgAddr));
-end behav;
+	data_out <= ram(to_integer(readAddr));
+	dataDbg_out <= ram(to_integer(readDbgAddr));
+end Behavioral;

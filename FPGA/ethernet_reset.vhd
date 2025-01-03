@@ -18,7 +18,7 @@ entity ethernet_reset is
 		power_good	: in std_logic;
 
 		phy_rstn		: out std_logic; -- reset for PHY
-		mac_rstn		: out std_logic; -- reset for MAC
+		mac_rst		: out std_logic; -- reset for MAC
 		eth_rdy		: out std_logic
 	);
 end entity;
@@ -47,7 +47,7 @@ begin
 			elsif s_SM_Ethernet = s_Reset then
 				-- rise reset signals
 				phy_rstn <= '0';
-				mac_rstn <= '0';
+				mac_rst <= '1';
 				counter <= 0;
 				
 				s_SM_Ethernet <= s_Wait2;
@@ -64,7 +64,7 @@ begin
 			elsif s_SM_Ethernet = s_Wait3 then
 				-- disable reset signal
 				phy_rstn <= '1';
-				mac_rstn <= '1';
+				mac_rst <= '0';
 
 				counter <= counter + 1;
 				-- wait 4 ms

@@ -752,7 +752,7 @@ applicable agreement for further details.
 )
 (pin
 	(output)
-	(rect 2712 216 2888 232)
+	(rect 2712 208 2888 224)
 	(text "OUTPUT" (rect 1 0 39 10)(font "Arial" (font_size 6)))
 	(text "PHY_Resetn" (rect 90 0 154 12)(font "Arial" ))
 	(pt 0 8)
@@ -765,7 +765,7 @@ applicable agreement for further details.
 		(line (pt 82 8)(pt 78 12))
 		(line (pt 78 12)(pt 82 8))
 	)
-	(annotation_block (location)(rect 2832 192 2888 208))
+	(annotation_block (location)(rect 2832 184 2888 200))
 )
 (pin
 	(output)
@@ -1179,42 +1179,6 @@ applicable agreement for further details.
 	)
 )
 (symbol
-	(rect 1864 672 2008 752)
-	(text "detect_rising_edge" (rect 5 0 97 12)(font "Arial" ))
-	(text "inst10" (rect 8 64 37 76)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "clk" (rect 0 0 14 12)(font "Arial" ))
-		(text "clk" (rect 21 27 35 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32))
-	)
-	(port
-		(pt 0 48)
-		(input)
-		(text "input" (rect 0 0 23 12)(font "Arial" ))
-		(text "input" (rect 21 43 44 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48))
-	)
-	(port
-		(pt 144 32)
-		(output)
-		(text "rising" (rect 0 0 25 12)(font "Arial" ))
-		(text "rising" (rect 102 27 127 39)(font "Arial" ))
-		(line (pt 144 32)(pt 128 32))
-	)
-	(port
-		(pt 144 48)
-		(output)
-		(text "falling" (rect 0 0 29 12)(font "Arial" ))
-		(text "falling" (rect 99 43 128 55)(font "Arial" ))
-		(line (pt 144 48)(pt 128 48))
-	)
-	(drawing
-		(rectangle (rect 16 16 128 64))
-	)
-)
-(symbol
 	(rect 64 296 304 504)
 	(text "PLL1" (rect 105 0 140 16)(font "Arial" (font_size 10)))
 	(text "inst2" (rect 8 192 31 204)(font "Arial" ))
@@ -1308,49 +1272,6 @@ applicable agreement for further details.
 		(line (pt 239 96)(pt 207 96))
 		(line (pt 239 112)(pt 207 112))
 		(line (pt 239 128)(pt 207 128))
-	)
-)
-(symbol
-	(rect 2504 192 2688 304)
-	(text "ethernet_reset" (rect 5 0 75 12)(font "Arial" ))
-	(text "inst1" (rect 8 96 31 108)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "clk" (rect 0 0 14 12)(font "Arial" ))
-		(text "clk" (rect 21 27 35 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32))
-	)
-	(port
-		(pt 0 48)
-		(input)
-		(text "power_good" (rect 0 0 57 12)(font "Arial" ))
-		(text "power_good" (rect 21 43 78 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48))
-	)
-	(port
-		(pt 184 32)
-		(output)
-		(text "phy_rstn" (rect 0 0 43 12)(font "Arial" ))
-		(text "phy_rstn" (rect 127 27 170 39)(font "Arial" ))
-		(line (pt 184 32)(pt 168 32))
-	)
-	(port
-		(pt 184 48)
-		(output)
-		(text "mac_rst" (rect 0 0 40 12)(font "Arial" ))
-		(text "mac_rst" (rect 130 43 170 55)(font "Arial" ))
-		(line (pt 184 48)(pt 168 48))
-	)
-	(port
-		(pt 184 64)
-		(output)
-		(text "eth_rdy" (rect 0 0 37 12)(font "Arial" ))
-		(text "eth_rdy" (rect 132 59 169 71)(font "Arial" ))
-		(line (pt 184 64)(pt 168 64))
-	)
-	(drawing
-		(rectangle (rect 16 16 168 96))
 	)
 )
 (symbol
@@ -1647,99 +1568,6 @@ applicable agreement for further details.
 	(annotation_block (parameter)(rect 3688 360 3870 388))
 )
 (symbol
-	(rect 3352 560 3608 704)
-	(text "ethernet_receive" (rect 5 0 87 12)(font "Arial" ))
-	(text "inst32" (rect 8 128 37 140)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "rx_clk" (rect 0 0 29 12)(font "Arial" ))
-		(text "rx_clk" (rect 21 27 50 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32))
-	)
-	(port
-		(pt 0 48)
-		(input)
-		(text "rx_frame" (rect 0 0 44 12)(font "Arial" ))
-		(text "rx_frame" (rect 21 43 65 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48))
-	)
-	(port
-		(pt 0 64)
-		(input)
-		(text "rx_data[7..0]" (rect 0 0 62 12)(font "Arial" ))
-		(text "rx_data[7..0]" (rect 21 59 83 71)(font "Arial" ))
-		(line (pt 0 64)(pt 16 64)(line_width 3))
-	)
-	(port
-		(pt 0 80)
-		(input)
-		(text "rx_byte_received" (rect 0 0 86 12)(font "Arial" ))
-		(text "rx_byte_received" (rect 21 75 107 87)(font "Arial" ))
-		(line (pt 0 80)(pt 16 80))
-	)
-	(port
-		(pt 0 96)
-		(input)
-		(text "rx_error" (rect 0 0 37 12)(font "Arial" ))
-		(text "rx_error" (rect 21 91 58 103)(font "Arial" ))
-		(line (pt 0 96)(pt 16 96))
-	)
-	(port
-		(pt 256 32)
-		(output)
-		(text "ram_addr[10..0]" (rect 0 0 77 12)(font "Arial" ))
-		(text "ram_addr[10..0]" (rect 170 27 247 39)(font "Arial" ))
-		(line (pt 256 32)(pt 240 32)(line_width 3))
-	)
-	(port
-		(pt 256 48)
-		(output)
-		(text "ram_data[7..0]" (rect 0 0 71 12)(font "Arial" ))
-		(text "ram_data[7..0]" (rect 175 43 246 55)(font "Arial" ))
-		(line (pt 256 48)(pt 240 48)(line_width 3))
-	)
-	(port
-		(pt 256 64)
-		(output)
-		(text "rx_byte_count[10..0]" (rect 0 0 102 12)(font "Arial" ))
-		(text "rx_byte_count[10..0]" (rect 149 59 251 71)(font "Arial" ))
-		(line (pt 256 64)(pt 240 64)(line_width 3))
-	)
-	(port
-		(pt 256 80)
-		(output)
-		(text "frame_rdy" (rect 0 0 51 12)(font "Arial" ))
-		(text "frame_rdy" (rect 192 75 243 87)(font "Arial" ))
-		(line (pt 256 80)(pt 240 80))
-	)
-	(drawing
-		(rectangle (rect 16 16 240 128))
-	)
-)
-(symbol
-	(rect 2472 304 2752 384)
-	(text "reverse_mac" (rect 5 0 69 12)(font "Arial" ))
-	(text "inst14" (rect 8 64 37 76)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "mac_address_i[47..0]" (rect 0 0 106 12)(font "Arial" ))
-		(text "mac_address_i[47..0]" (rect 21 27 127 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32)(line_width 3))
-	)
-	(port
-		(pt 280 32)
-		(output)
-		(text "mac_address_o[47..0]" (rect 0 0 109 12)(font "Arial" ))
-		(text "mac_address_o[47..0]" (rect 167 27 276 39)(font "Arial" ))
-		(line (pt 280 32)(pt 264 32)(line_width 3))
-	)
-	(drawing
-		(rectangle (rect 16 16 264 64))
-	)
-)
-(symbol
 	(rect 2504 504 2616 552)
 	(text "const_eth_speed" (rect 11 0 127 16)(font "Arial" (font_size 10)))
 	(text "inst15" (rect 8 32 37 44)(font "Arial" ))
@@ -1871,70 +1699,6 @@ applicable agreement for further details.
 	)
 	(drawing
 		(rectangle (rect 16 16 248 224))
-	)
-)
-(symbol
-	(rect 2624 608 2824 752)
-	(text "ethernet_packet_aggregator" (rect 5 0 141 12)(font "Arial" ))
-	(text "inst19" (rect 8 128 37 140)(font "Arial" ))
-	(port
-		(pt 0 32)
-		(input)
-		(text "tx_en0_i" (rect 0 0 41 12)(font "Arial" ))
-		(text "tx_en0_i" (rect 21 27 62 39)(font "Arial" ))
-		(line (pt 0 32)(pt 16 32))
-	)
-	(port
-		(pt 0 48)
-		(input)
-		(text "data0_i[7..0]" (rect 0 0 61 12)(font "Arial" ))
-		(text "data0_i[7..0]" (rect 21 43 82 55)(font "Arial" ))
-		(line (pt 0 48)(pt 16 48)(line_width 3))
-	)
-	(port
-		(pt 0 64)
-		(input)
-		(text "tx_en1_i" (rect 0 0 41 12)(font "Arial" ))
-		(text "tx_en1_i" (rect 21 59 62 71)(font "Arial" ))
-		(line (pt 0 64)(pt 16 64))
-	)
-	(port
-		(pt 0 80)
-		(input)
-		(text "data1_i[7..0]" (rect 0 0 61 12)(font "Arial" ))
-		(text "data1_i[7..0]" (rect 21 75 82 87)(font "Arial" ))
-		(line (pt 0 80)(pt 16 80)(line_width 3))
-	)
-	(port
-		(pt 0 96)
-		(input)
-		(text "tx_en2_i" (rect 0 0 41 12)(font "Arial" ))
-		(text "tx_en2_i" (rect 21 91 62 103)(font "Arial" ))
-		(line (pt 0 96)(pt 16 96))
-	)
-	(port
-		(pt 0 112)
-		(input)
-		(text "data2_i[7..0]" (rect 0 0 61 12)(font "Arial" ))
-		(text "data2_i[7..0]" (rect 21 107 82 119)(font "Arial" ))
-		(line (pt 0 112)(pt 16 112)(line_width 3))
-	)
-	(port
-		(pt 200 32)
-		(output)
-		(text "tx_en_o" (rect 0 0 38 12)(font "Arial" ))
-		(text "tx_en_o" (rect 147 27 185 39)(font "Arial" ))
-		(line (pt 200 32)(pt 184 32))
-	)
-	(port
-		(pt 200 48)
-		(output)
-		(text "data_o[7..0]" (rect 0 0 59 12)(font "Arial" ))
-		(text "data_o[7..0]" (rect 130 43 189 55)(font "Arial" ))
-		(line (pt 200 48)(pt 184 48)(line_width 3))
-	)
-	(drawing
-		(rectangle (rect 16 16 184 128))
 	)
 )
 (symbol
@@ -2148,91 +1912,263 @@ applicable agreement for further details.
 		(pt 184 32)
 		(output)
 		(text "mac_address[47..0]" (rect 0 0 97 12)(font "Arial" ))
-		(text "mac_address[47..0]" (rect 81 27 178 39)(font "Arial" ))
+		(text "mac_address[47..0]" (rect 81 27 163 39)(font "Arial" ))
 		(line (pt 184 32)(pt 168 32)(line_width 3))
 	)
 	(port
 		(pt 184 48)
 		(output)
 		(text "ip_address[31..0]" (rect 0 0 84 12)(font "Arial" ))
-		(text "ip_address[31..0]" (rect 92 43 176 55)(font "Arial" ))
+		(text "ip_address[31..0]" (rect 92 43 163 55)(font "Arial" ))
 		(line (pt 184 48)(pt 168 48)(line_width 3))
 	)
 	(port
 		(pt 184 64)
 		(output)
 		(text "dst_ip_address[31..0]" (rect 0 0 106 12)(font "Arial" ))
-		(text "dst_ip_address[31..0]" (rect 74 59 180 71)(font "Arial" ))
+		(text "dst_ip_address[31..0]" (rect 74 59 163 71)(font "Arial" ))
 		(line (pt 184 64)(pt 168 64)(line_width 3))
 	)
 	(port
 		(pt 184 80)
 		(output)
 		(text "src_udp_port[15..0]" (rect 0 0 95 12)(font "Arial" ))
-		(text "src_udp_port[15..0]" (rect 83 75 178 87)(font "Arial" ))
+		(text "src_udp_port[15..0]" (rect 83 75 163 87)(font "Arial" ))
 		(line (pt 184 80)(pt 168 80)(line_width 3))
 	)
 	(port
 		(pt 184 96)
 		(output)
 		(text "dst_udp_port[15..0]" (rect 0 0 95 12)(font "Arial" ))
-		(text "dst_udp_port[15..0]" (rect 83 91 178 103)(font "Arial" ))
+		(text "dst_udp_port[15..0]" (rect 83 91 163 103)(font "Arial" ))
 		(line (pt 184 96)(pt 168 96)(line_width 3))
 	)
+	(parameter
+		"MAC0"
+		"0"
+		""
+		(type "PARAMETER_UNSIGNED_DEC")	)
+	(parameter
+		"MAC1"
+		"28"
+		""
+		(type "PARAMETER_UNSIGNED_DEC")	)
+	(parameter
+		"MAC2"
+		"35"
+		""
+		(type "PARAMETER_UNSIGNED_DEC")	)
+	(parameter
+		"MAC3"
+		"23"
+		""
+		(type "PARAMETER_UNSIGNED_DEC")	)
+	(parameter
+		"MAC4"
+		"74"
+		""
+		(type "PARAMETER_UNSIGNED_DEC")	)
+	(parameter
+		"MAC5"
+		"203"
+		""
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"IP0"
 		"192"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"IP1"
 		"168"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"IP2"
 		"42"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"IP3"
 		"43"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"SrcPort"
 		"4023"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"DestIP0"
 		"192"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"DestIP1"
 		"168"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"DestIP2"
 		"42"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"DestIP3"
 		"42"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(parameter
 		"DestPort"
 		"4023"
 		""
-		(type "PARAMETER_SIGNED_DEC")	)
+		(type "PARAMETER_UNSIGNED_DEC")	)
 	(drawing
 		(rectangle (rect 16 16 168 128))
 	)
-	(annotation_block (parameter)(rect 1840 360 2022 514))
+	(annotation_block (parameter)(rect 1840 280 2036 518))
+)
+(symbol
+	(rect 2456 304 2736 384)
+	(text "reverse_mac" (rect 5 0 69 12)(font "Arial" ))
+	(text "inst12" (rect 8 64 37 76)(font "Arial" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "mac_address_i[47..0]" (rect 0 0 106 12)(font "Arial" ))
+		(text "mac_address_i[47..0]" (rect 21 27 127 39)(font "Arial" ))
+		(line (pt 0 32)(pt 16 32)(line_width 3))
+	)
+	(port
+		(pt 280 32)
+		(output)
+		(text "mac_address_o[47..0]" (rect 0 0 109 12)(font "Arial" ))
+		(text "mac_address_o[47..0]" (rect 167 27 276 39)(font "Arial" ))
+		(line (pt 280 32)(pt 264 32)(line_width 3))
+	)
+	(drawing
+		(rectangle (rect 16 16 264 64))
+	)
+)
+(symbol
+	(rect 2464 184 2680 296)
+	(text "ethernet_reset" (rect 5 0 75 12)(font "Arial" ))
+	(text "inst1" (rect 8 96 31 108)(font "Arial" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "clk" (rect 0 0 14 12)(font "Arial" ))
+		(text "clk" (rect 21 27 35 39)(font "Arial" ))
+		(line (pt 0 32)(pt 16 32))
+	)
+	(port
+		(pt 0 48)
+		(input)
+		(text "power_good" (rect 0 0 57 12)(font "Arial" ))
+		(text "power_good" (rect 21 43 78 55)(font "Arial" ))
+		(line (pt 0 48)(pt 16 48))
+	)
+	(port
+		(pt 216 32)
+		(output)
+		(text "phy_rstn" (rect 0 0 43 12)(font "Arial" ))
+		(text "phy_rstn" (rect 159 27 195 39)(font "Arial" ))
+		(line (pt 216 32)(pt 200 32))
+	)
+	(port
+		(pt 216 48)
+		(output)
+		(text "mac_rst" (rect 0 0 40 12)(font "Arial" ))
+		(text "mac_rst" (rect 162 43 195 55)(font "Arial" ))
+		(line (pt 216 48)(pt 200 48))
+	)
+	(port
+		(pt 216 64)
+		(output)
+		(text "sendArpRequest" (rect 0 0 81 12)(font "Arial" ))
+		(text "sendArpRequest" (rect 127 59 195 71)(font "Arial" ))
+		(line (pt 216 64)(pt 200 64))
+	)
+	(drawing
+		(rectangle (rect 16 16 200 96))
+	)
+)
+(symbol
+	(rect 3352 560 3608 704)
+	(text "ethernet_receive" (rect 5 0 87 12)(font "Arial" ))
+	(text "inst32" (rect 8 128 37 140)(font "Arial" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "rx_clk" (rect 0 0 29 12)(font "Arial" ))
+		(text "rx_clk" (rect 21 27 50 39)(font "Arial" ))
+		(line (pt 0 32)(pt 16 32))
+	)
+	(port
+		(pt 0 48)
+		(input)
+		(text "rx_frame" (rect 0 0 44 12)(font "Arial" ))
+		(text "rx_frame" (rect 21 43 65 55)(font "Arial" ))
+		(line (pt 0 48)(pt 16 48))
+	)
+	(port
+		(pt 0 64)
+		(input)
+		(text "rx_data[7..0]" (rect 0 0 62 12)(font "Arial" ))
+		(text "rx_data[7..0]" (rect 21 59 83 71)(font "Arial" ))
+		(line (pt 0 64)(pt 16 64)(line_width 3))
+	)
+	(port
+		(pt 0 80)
+		(input)
+		(text "rx_byte_received" (rect 0 0 86 12)(font "Arial" ))
+		(text "rx_byte_received" (rect 21 75 107 87)(font "Arial" ))
+		(line (pt 0 80)(pt 16 80))
+	)
+	(port
+		(pt 0 96)
+		(input)
+		(text "rx_error" (rect 0 0 37 12)(font "Arial" ))
+		(text "rx_error" (rect 21 91 58 103)(font "Arial" ))
+		(line (pt 0 96)(pt 16 96))
+	)
+	(port
+		(pt 256 32)
+		(output)
+		(text "ram_addr[10..0]" (rect 0 0 77 12)(font "Arial" ))
+		(text "ram_addr[10..0]" (rect 170 27 235 39)(font "Arial" ))
+		(line (pt 256 32)(pt 240 32)(line_width 3))
+	)
+	(port
+		(pt 256 48)
+		(output)
+		(text "ram_data[7..0]" (rect 0 0 71 12)(font "Arial" ))
+		(text "ram_data[7..0]" (rect 175 43 235 55)(font "Arial" ))
+		(line (pt 256 48)(pt 240 48)(line_width 3))
+	)
+	(port
+		(pt 256 64)
+		(output)
+		(text "rx_byte_count[10..0]" (rect 0 0 102 12)(font "Arial" ))
+		(text "rx_byte_count[10..0]" (rect 149 59 235 71)(font "Arial" ))
+		(line (pt 256 64)(pt 240 64)(line_width 3))
+	)
+	(port
+		(pt 256 80)
+		(output)
+		(text "frame_rdy" (rect 0 0 51 12)(font "Arial" ))
+		(text "frame_rdy" (rect 192 75 235 87)(font "Arial" ))
+		(line (pt 256 80)(pt 240 80))
+	)
+	(parameter
+		"lastRamAddress"
+		"100"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(drawing
+		(rectangle (rect 16 16 240 128))
+	)
+	(annotation_block (parameter)(rect 3376 520 3592 552))
 )
 (symbol
 	(rect 3904 544 4152 816)
@@ -2283,97 +2219,97 @@ applicable agreement for further details.
 	(port
 		(pt 248 32)
 		(output)
-		(text "dst_mac[47..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "dst_mac[47..0]" (rect 165 27 227 39)(font "Arial" ))
+		(text "pkt_dst_mac[47..0]" (rect 0 0 95 12)(font "Arial" ))
+		(text "pkt_dst_mac[47..0]" (rect 147 27 242 39)(font "Arial" ))
 		(line (pt 248 32)(pt 232 32)(line_width 3))
 	)
 	(port
 		(pt 248 48)
 		(output)
-		(text "src_mac[47..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "src_mac[47..0]" (rect 165 43 227 55)(font "Arial" ))
+		(text "pkt_src_mac[47..0]" (rect 0 0 95 12)(font "Arial" ))
+		(text "pkt_src_mac[47..0]" (rect 147 43 242 55)(font "Arial" ))
 		(line (pt 248 48)(pt 232 48)(line_width 3))
 	)
 	(port
 		(pt 248 64)
 		(output)
-		(text "packet_type[15..0]" (rect 0 0 93 12)(font "Arial" ))
-		(text "packet_type[15..0]" (rect 149 59 227 71)(font "Arial" ))
+		(text "pkt_type[15..0]" (rect 0 0 75 12)(font "Arial" ))
+		(text "pkt_type[15..0]" (rect 164 59 239 71)(font "Arial" ))
 		(line (pt 248 64)(pt 232 64)(line_width 3))
 	)
 	(port
 		(pt 248 80)
 		(output)
 		(text "arp_type[15..0]" (rect 0 0 75 12)(font "Arial" ))
-		(text "arp_type[15..0]" (rect 164 75 227 87)(font "Arial" ))
+		(text "arp_type[15..0]" (rect 164 75 239 87)(font "Arial" ))
 		(line (pt 248 80)(pt 232 80)(line_width 3))
 	)
 	(port
 		(pt 248 96)
 		(output)
 		(text "arp_dst_ip[31..0]" (rect 0 0 82 12)(font "Arial" ))
-		(text "arp_dst_ip[31..0]" (rect 158 91 227 103)(font "Arial" ))
+		(text "arp_dst_ip[31..0]" (rect 158 91 240 103)(font "Arial" ))
 		(line (pt 248 96)(pt 232 96)(line_width 3))
 	)
 	(port
 		(pt 248 112)
 		(output)
 		(text "arp_src_ip[31..0]" (rect 0 0 82 12)(font "Arial" ))
-		(text "arp_src_ip[31..0]" (rect 158 107 227 119)(font "Arial" ))
+		(text "arp_src_ip[31..0]" (rect 158 107 240 119)(font "Arial" ))
 		(line (pt 248 112)(pt 232 112)(line_width 3))
 	)
 	(port
 		(pt 248 128)
 		(output)
 		(text "ip_type[7..0]" (rect 0 0 62 12)(font "Arial" ))
-		(text "ip_type[7..0]" (rect 175 123 227 135)(font "Arial" ))
+		(text "ip_type[7..0]" (rect 175 123 237 135)(font "Arial" ))
 		(line (pt 248 128)(pt 232 128)(line_width 3))
 	)
 	(port
 		(pt 248 144)
 		(output)
 		(text "udp_src_port[15..0]" (rect 0 0 95 12)(font "Arial" ))
-		(text "udp_src_port[15..0]" (rect 147 139 227 151)(font "Arial" ))
+		(text "udp_src_port[15..0]" (rect 147 139 242 151)(font "Arial" ))
 		(line (pt 248 144)(pt 232 144)(line_width 3))
 	)
 	(port
 		(pt 248 160)
 		(output)
 		(text "udp_dst_port[15..0]" (rect 0 0 95 12)(font "Arial" ))
-		(text "udp_dst_port[15..0]" (rect 147 155 227 167)(font "Arial" ))
+		(text "udp_dst_port[15..0]" (rect 147 155 242 167)(font "Arial" ))
 		(line (pt 248 160)(pt 232 160)(line_width 3))
 	)
 	(port
 		(pt 248 176)
 		(output)
 		(text "udp_length[15..0]" (rect 0 0 84 12)(font "Arial" ))
-		(text "udp_length[15..0]" (rect 156 171 227 183)(font "Arial" ))
+		(text "udp_length[15..0]" (rect 156 171 240 183)(font "Arial" ))
 		(line (pt 248 176)(pt 232 176)(line_width 3))
 	)
 	(port
 		(pt 248 192)
 		(output)
 		(text "data0_out[7..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "data0_out[7..0]" (rect 165 187 227 199)(font "Arial" ))
+		(text "data0_out[7..0]" (rect 165 187 239 199)(font "Arial" ))
 		(line (pt 248 192)(pt 232 192)(line_width 3))
 	)
 	(port
 		(pt 248 208)
 		(output)
 		(text "data1_out[7..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "data1_out[7..0]" (rect 165 203 227 215)(font "Arial" ))
+		(text "data1_out[7..0]" (rect 165 203 239 215)(font "Arial" ))
 		(line (pt 248 208)(pt 232 208)(line_width 3))
 	)
 	(port
 		(pt 248 224)
 		(output)
 		(text "data2_out[7..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "data2_out[7..0]" (rect 165 219 227 231)(font "Arial" ))
+		(text "data2_out[7..0]" (rect 165 219 239 231)(font "Arial" ))
 		(line (pt 248 224)(pt 232 224)(line_width 3))
 	)
 	(parameter
 		"lastAddress"
-		"150"
+		"100"
 		""
 		(type "PARAMETER_SIGNED_DEC")	)
 	(drawing
@@ -2395,22 +2331,22 @@ applicable agreement for further details.
 	(port
 		(pt 0 48)
 		(input)
-		(text "dst_mac[47..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "dst_mac[47..0]" (rect 21 43 95 55)(font "Arial" ))
+		(text "pkt_dst_mac[47..0]" (rect 0 0 95 12)(font "Arial" ))
+		(text "pkt_dst_mac[47..0]" (rect 21 43 116 55)(font "Arial" ))
 		(line (pt 0 48)(pt 16 48)(line_width 3))
 	)
 	(port
 		(pt 0 64)
 		(input)
-		(text "src_mac[47..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "src_mac[47..0]" (rect 21 59 95 71)(font "Arial" ))
+		(text "pkt_src_mac[47..0]" (rect 0 0 95 12)(font "Arial" ))
+		(text "pkt_src_mac[47..0]" (rect 21 59 116 71)(font "Arial" ))
 		(line (pt 0 64)(pt 16 64)(line_width 3))
 	)
 	(port
 		(pt 0 80)
 		(input)
-		(text "packet_type[15..0]" (rect 0 0 93 12)(font "Arial" ))
-		(text "packet_type[15..0]" (rect 21 75 114 87)(font "Arial" ))
+		(text "pkt_type[15..0]" (rect 0 0 75 12)(font "Arial" ))
+		(text "pkt_type[15..0]" (rect 21 75 96 87)(font "Arial" ))
 		(line (pt 0 80)(pt 16 80)(line_width 3))
 	)
 	(port
@@ -2528,19 +2464,196 @@ applicable agreement for further details.
 	(port
 		(pt 288 96)
 		(output)
-		(text "udp_payload[31..0]" (rect 0 0 94 12)(font "Arial" ))
-		(text "udp_payload[31..0]" (rect 188 91 267 103)(font "Arial" ))
+		(text "icmp_dst_mac[47..0]" (rect 0 0 103 12)(font "Arial" ))
+		(text "icmp_dst_mac[47..0]" (rect 180 91 267 103)(font "Arial" ))
 		(line (pt 288 96)(pt 272 96)(line_width 3))
 	)
 	(port
 		(pt 288 112)
 		(output)
-		(text "ram_read_address[10..0]" (rect 0 0 122 12)(font "Arial" ))
-		(text "ram_read_address[10..0]" (rect 164 107 267 119)(font "Arial" ))
+		(text "icmp_dst_ip[31..0]" (rect 0 0 90 12)(font "Arial" ))
+		(text "icmp_dst_ip[31..0]" (rect 191 107 267 119)(font "Arial" ))
 		(line (pt 288 112)(pt 272 112)(line_width 3))
+	)
+	(port
+		(pt 288 128)
+		(output)
+		(text "send_icmp_response" (rect 0 0 103 12)(font "Arial" ))
+		(text "send_icmp_response" (rect 180 123 267 135)(font "Arial" ))
+		(line (pt 288 128)(pt 272 128))
+	)
+	(port
+		(pt 288 144)
+		(output)
+		(text "udp_payload[31..0]" (rect 0 0 94 12)(font "Arial" ))
+		(text "udp_payload[31..0]" (rect 188 139 267 151)(font "Arial" ))
+		(line (pt 288 144)(pt 272 144)(line_width 3))
+	)
+	(port
+		(pt 288 160)
+		(output)
+		(text "ram_read_address[10..0]" (rect 0 0 122 12)(font "Arial" ))
+		(text "ram_read_address[10..0]" (rect 164 155 267 167)(font "Arial" ))
+		(line (pt 288 160)(pt 272 160)(line_width 3))
 	)
 	(drawing
 		(rectangle (rect 16 16 272 288))
+	)
+)
+(symbol
+	(rect 2664 608 2864 784)
+	(text "ethernet_packet_aggregator" (rect 5 0 141 12)(font "Arial" ))
+	(text "inst19" (rect 8 160 37 172)(font "Arial" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "tx_en0_i" (rect 0 0 41 12)(font "Arial" ))
+		(text "tx_en0_i" (rect 21 27 62 39)(font "Arial" ))
+		(line (pt 0 32)(pt 16 32))
+	)
+	(port
+		(pt 0 48)
+		(input)
+		(text "data0_i[7..0]" (rect 0 0 61 12)(font "Arial" ))
+		(text "data0_i[7..0]" (rect 21 43 82 55)(font "Arial" ))
+		(line (pt 0 48)(pt 16 48)(line_width 3))
+	)
+	(port
+		(pt 0 64)
+		(input)
+		(text "tx_en1_i" (rect 0 0 41 12)(font "Arial" ))
+		(text "tx_en1_i" (rect 21 59 62 71)(font "Arial" ))
+		(line (pt 0 64)(pt 16 64))
+	)
+	(port
+		(pt 0 80)
+		(input)
+		(text "data1_i[7..0]" (rect 0 0 61 12)(font "Arial" ))
+		(text "data1_i[7..0]" (rect 21 75 82 87)(font "Arial" ))
+		(line (pt 0 80)(pt 16 80)(line_width 3))
+	)
+	(port
+		(pt 0 96)
+		(input)
+		(text "tx_en2_i" (rect 0 0 41 12)(font "Arial" ))
+		(text "tx_en2_i" (rect 21 91 62 103)(font "Arial" ))
+		(line (pt 0 96)(pt 16 96))
+	)
+	(port
+		(pt 0 112)
+		(input)
+		(text "data2_i[7..0]" (rect 0 0 61 12)(font "Arial" ))
+		(text "data2_i[7..0]" (rect 21 107 82 119)(font "Arial" ))
+		(line (pt 0 112)(pt 16 112)(line_width 3))
+	)
+	(port
+		(pt 0 128)
+		(input)
+		(text "tx_en3_i" (rect 0 0 41 12)(font "Arial" ))
+		(text "tx_en3_i" (rect 21 123 62 135)(font "Arial" ))
+		(line (pt 0 128)(pt 16 128))
+	)
+	(port
+		(pt 0 144)
+		(input)
+		(text "data3_i[7..0]" (rect 0 0 61 12)(font "Arial" ))
+		(text "data3_i[7..0]" (rect 21 139 82 151)(font "Arial" ))
+		(line (pt 0 144)(pt 16 144)(line_width 3))
+	)
+	(port
+		(pt 200 32)
+		(output)
+		(text "tx_en_o" (rect 0 0 38 12)(font "Arial" ))
+		(text "tx_en_o" (rect 147 27 179 39)(font "Arial" ))
+		(line (pt 200 32)(pt 184 32))
+	)
+	(port
+		(pt 200 48)
+		(output)
+		(text "data_o[7..0]" (rect 0 0 59 12)(font "Arial" ))
+		(text "data_o[7..0]" (rect 130 43 179 55)(font "Arial" ))
+		(line (pt 200 48)(pt 184 48)(line_width 3))
+	)
+	(drawing
+		(rectangle (rect 16 16 184 160))
+	)
+)
+(symbol
+	(rect 2288 1344 2536 1520)
+	(text "icmp_packet" (rect 5 0 67 12)(font "Arial" ))
+	(text "inst14" (rect 8 160 37 172)(font "Arial" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "src_mac_address[47..0]" (rect 0 0 119 12)(font "Arial" ))
+		(text "src_mac_address[47..0]" (rect 21 27 140 39)(font "Arial" ))
+		(line (pt 0 32)(pt 16 32)(line_width 3))
+	)
+	(port
+		(pt 0 48)
+		(input)
+		(text "src_ip_address[31..0]" (rect 0 0 106 12)(font "Arial" ))
+		(text "src_ip_address[31..0]" (rect 21 43 127 55)(font "Arial" ))
+		(line (pt 0 48)(pt 16 48)(line_width 3))
+	)
+	(port
+		(pt 0 64)
+		(input)
+		(text "dst_mac_address[47..0]" (rect 0 0 119 12)(font "Arial" ))
+		(text "dst_mac_address[47..0]" (rect 21 59 140 71)(font "Arial" ))
+		(line (pt 0 64)(pt 16 64)(line_width 3))
+	)
+	(port
+		(pt 0 80)
+		(input)
+		(text "dst_ip_address[31..0]" (rect 0 0 106 12)(font "Arial" ))
+		(text "dst_ip_address[31..0]" (rect 21 75 127 87)(font "Arial" ))
+		(line (pt 0 80)(pt 16 80)(line_width 3))
+	)
+	(port
+		(pt 0 96)
+		(input)
+		(text "frame_start" (rect 0 0 57 12)(font "Arial" ))
+		(text "frame_start" (rect 21 91 78 103)(font "Arial" ))
+		(line (pt 0 96)(pt 16 96))
+	)
+	(port
+		(pt 0 112)
+		(input)
+		(text "tx_clk" (rect 0 0 29 12)(font "Arial" ))
+		(text "tx_clk" (rect 21 107 50 119)(font "Arial" ))
+		(line (pt 0 112)(pt 16 112))
+	)
+	(port
+		(pt 0 128)
+		(input)
+		(text "tx_busy" (rect 0 0 40 12)(font "Arial" ))
+		(text "tx_busy" (rect 21 123 61 135)(font "Arial" ))
+		(line (pt 0 128)(pt 16 128))
+	)
+	(port
+		(pt 0 144)
+		(input)
+		(text "tx_byte_sent" (rect 0 0 64 12)(font "Arial" ))
+		(text "tx_byte_sent" (rect 21 139 85 151)(font "Arial" ))
+		(line (pt 0 144)(pt 16 144))
+	)
+	(port
+		(pt 248 32)
+		(output)
+		(text "tx_enable" (rect 0 0 47 12)(font "Arial" ))
+		(text "tx_enable" (rect 188 27 235 39)(font "Arial" ))
+		(line (pt 248 32)(pt 232 32))
+	)
+	(port
+		(pt 248 48)
+		(output)
+		(text "tx_data[7..0]" (rect 0 0 62 12)(font "Arial" ))
+		(text "tx_data[7..0]" (rect 175 43 237 55)(font "Arial" ))
+		(line (pt 248 48)(pt 232 48)(line_width 3))
+	)
+	(drawing
+		(rectangle (rect 16 16 232 160))
 	)
 )
 (connector
@@ -2797,14 +2910,6 @@ applicable agreement for further details.
 	(pt 3112 912)
 )
 (connector
-	(pt 3336 544)
-	(pt 3336 576)
-)
-(connector
-	(pt 3336 576)
-	(pt 3336 592)
-)
-(connector
 	(pt 3336 592)
 	(pt 3352 592)
 )
@@ -2967,43 +3072,6 @@ applicable agreement for further details.
 	(pt 2792 368)
 )
 (connector
-	(pt 2920 384)
-	(pt 2776 384)
-	(bus)
-)
-(connector
-	(pt 2792 368)
-	(pt 2792 240)
-)
-(connector
-	(pt 2776 384)
-	(pt 2776 336)
-	(bus)
-)
-(connector
-	(text "clk_1kHz" (rect 2434 208 2478 220)(font "Arial" ))
-	(pt 2416 224)
-	(pt 2504 224)
-)
-(connector
-	(text "powerGood" (rect 2434 224 2488 236)(font "Arial" ))
-	(pt 2416 240)
-	(pt 2504 240)
-)
-(connector
-	(pt 2688 224)
-	(pt 2712 224)
-)
-(connector
-	(pt 2688 240)
-	(pt 2792 240)
-)
-(connector
-	(pt 2752 336)
-	(pt 2776 336)
-	(bus)
-)
-(connector
 	(pt 2776 528)
 	(pt 2776 512)
 	(bus)
@@ -3048,85 +3116,13 @@ applicable agreement for further details.
 	(bus)
 )
 (connector
-	(pt 2552 624)
-	(pt 2552 656)
-	(bus)
-)
-(connector
-	(pt 2568 608)
-	(pt 2568 640)
-)
-(connector
-	(pt 2896 544)
-	(pt 2896 656)
-	(bus)
-)
-(connector
-	(pt 2880 528)
-	(pt 2880 640)
-)
-(connector
-	(pt 2568 640)
-	(pt 2624 640)
-)
-(connector
-	(pt 2552 656)
-	(pt 2624 656)
-	(bus)
-)
-(connector
-	(pt 2880 640)
-	(pt 2824 640)
-)
-(connector
-	(pt 2896 656)
-	(pt 2824 656)
-	(bus)
-)
-(connector
-	(pt 2584 1136)
-	(pt 2584 704)
-)
-(connector
-	(pt 2600 1152)
-	(pt 2600 720)
-	(bus)
-)
-(connector
-	(pt 2584 704)
-	(pt 2624 704)
-)
-(connector
-	(pt 2600 720)
-	(pt 2624 720)
-	(bus)
-)
-(connector
 	(pt 2536 896)
 	(pt 2568 896)
 	(bus)
 )
 (connector
-	(pt 2568 896)
-	(pt 2568 688)
-	(bus)
-)
-(connector
-	(pt 2624 688)
-	(pt 2568 688)
-	(bus)
-)
-(connector
 	(pt 2536 880)
 	(pt 2552 880)
-)
-(connector
-	(pt 2552 880)
-	(pt 2552 672)
-)
-(connector
-	(pt 2624 672)
-	(pt 2552 672)
 )
 (connector
 	(pt 3880 432)
@@ -3148,11 +3144,6 @@ applicable agreement for further details.
 	(bus)
 )
 (connector
-	(pt 2120 896)
-	(pt 2120 1152)
-	(bus)
-)
-(connector
 	(pt 2288 912)
 	(pt 2104 912)
 	(bus)
@@ -3165,11 +3156,6 @@ applicable agreement for further details.
 (connector
 	(pt 2104 576)
 	(pt 2104 912)
-	(bus)
-)
-(connector
-	(pt 2104 912)
-	(pt 2104 1168)
 	(bus)
 )
 (connector
@@ -3189,44 +3175,7 @@ applicable agreement for further details.
 	(bus)
 )
 (connector
-	(pt 2272 688)
-	(pt 2056 688)
-)
-(connector
-	(pt 2056 688)
-	(pt 2056 704)
-)
-(connector
-	(pt 2056 704)
-	(pt 2008 704)
-)
-(connector
-	(text "mac_tx_clk" (rect 1794 688 1850 700)(font "Arial" ))
-	(pt 1784 704)
-	(pt 1864 704)
-)
-(connector
-	(text "clk_2Hz" (rect 1794 704 1832 716)(font "Arial" ))
-	(pt 1784 720)
-	(pt 1864 720)
-)
-(connector
 	(pt 2272 592)
-	(pt 2248 592)
-	(bus)
-)
-(connector
-	(pt 2472 336)
-	(pt 2248 336)
-	(bus)
-)
-(connector
-	(pt 2248 336)
-	(pt 2248 560)
-	(bus)
-)
-(connector
-	(pt 2248 560)
 	(pt 2248 592)
 	(bus)
 )
@@ -3311,10 +3260,6 @@ applicable agreement for further details.
 	(pt 3400 848)
 )
 (connector
-	(pt 3336 544)
-	(pt 3872 544)
-)
-(connector
 	(pt 2288 1200)
 	(pt 2088 1200)
 	(bus)
@@ -3340,14 +3285,6 @@ applicable agreement for further details.
 	(pt 3608 608)
 	(pt 3904 608)
 	(bus)
-)
-(connector
-	(pt 3872 544)
-	(pt 3872 576)
-)
-(connector
-	(pt 3872 576)
-	(pt 3904 576)
 )
 (connector
 	(pt 2072 656)
@@ -3586,16 +3523,6 @@ applicable agreement for further details.
 	(bus)
 )
 (connector
-	(pt 4784 888)
-	(pt 4784 640)
-	(bus)
-)
-(connector
-	(pt 4768 640)
-	(pt 4784 640)
-	(bus)
-)
-(connector
 	(text "dst_mac_address[47..0]" (rect 4778 544 4897 556)(font "Arial" ))
 	(pt 4768 560)
 	(pt 4888 560)
@@ -3619,18 +3546,6 @@ applicable agreement for further details.
 	(pt 4888 608)
 )
 (connector
-	(text "udp_payload[31..0]" (rect 4778 608 4872 620)(font "Arial" ))
-	(pt 4768 624)
-	(pt 4888 624)
-	(bus)
-)
-(connector
-	(text "eth_byte_cnt[10..0]" (rect 666 440 762 452)(font "Arial" ))
-	(pt 800 456)
-	(pt 656 456)
-	(bus)
-)
-(connector
 	(text "eth_byte_cnt[10..0]" (rect 3618 608 3714 620)(font "Arial" ))
 	(pt 3608 624)
 	(pt 3688 624)
@@ -3651,6 +3566,293 @@ applicable agreement for further details.
 	(pt 3192 576)
 	(pt 3336 576)
 )
+(connector
+	(pt 2776 384)
+	(pt 2920 384)
+	(bus)
+)
+(connector
+	(pt 2776 336)
+	(pt 2736 336)
+	(bus)
+)
+(connector
+	(pt 2776 384)
+	(pt 2776 336)
+	(bus)
+)
+(connector
+	(pt 2248 336)
+	(pt 2456 336)
+	(bus)
+)
+(connector
+	(pt 2248 336)
+	(pt 2248 560)
+	(bus)
+)
+(connector
+	(pt 2248 560)
+	(pt 2248 592)
+	(bus)
+)
+(connector
+	(text "clk_2Hz" (rect 2162 672 2200 684)(font "Arial" ))
+	(pt 2272 688)
+	(pt 2152 688)
+)
+(connector
+	(pt 2792 368)
+	(pt 2792 232)
+)
+(connector
+	(text "clk_1kHz" (rect 2394 200 2438 212)(font "Arial" ))
+	(pt 2376 216)
+	(pt 2464 216)
+)
+(connector
+	(text "powerGood" (rect 2394 216 2448 228)(font "Arial" ))
+	(pt 2376 232)
+	(pt 2464 232)
+)
+(connector
+	(pt 2680 216)
+	(pt 2712 216)
+)
+(connector
+	(pt 2680 232)
+	(pt 2792 232)
+)
+(connector
+	(text "sendArpRequest" (rect 2690 232 2771 244)(font "Arial" ))
+	(pt 2680 248)
+	(pt 2768 248)
+)
+(connector
+	(text "sendArpRequest" (rect 2178 1200 2259 1212)(font "Arial" ))
+	(pt 2288 1216)
+	(pt 2168 1216)
+)
+(connector
+	(text "eth_byte_cnt[7..0]" (rect 666 440 756 452)(font "Arial" ))
+	(pt 800 456)
+	(pt 656 456)
+	(bus)
+)
+(connector
+	(pt 3336 512)
+	(pt 3336 576)
+)
+(connector
+	(pt 3336 576)
+	(pt 3336 592)
+)
+(connector
+	(pt 3904 576)
+	(pt 3880 576)
+)
+(connector
+	(pt 3336 512)
+	(pt 3880 512)
+)
+(connector
+	(pt 3880 576)
+	(pt 3880 512)
+)
+(connector
+	(pt 4768 688)
+	(pt 4784 688)
+	(bus)
+)
+(connector
+	(pt 4784 688)
+	(pt 4784 888)
+	(bus)
+)
+(connector
+	(text "udp_payload[31..0]" (rect 4778 656 4872 668)(font "Arial" ))
+	(pt 4768 672)
+	(pt 4888 672)
+	(bus)
+)
+(connector
+	(text "icmp_dst_mac_address[47..0]" (rect 4776 608 4924 620)(font "Arial" ))
+	(pt 4768 624)
+	(pt 4888 624)
+	(bus)
+)
+(connector
+	(text "icmp_dst_ip_address[31..0]" (rect 4778 624 4913 636)(font "Arial" ))
+	(pt 4768 640)
+	(pt 4888 640)
+	(bus)
+)
+(connector
+	(text "eth_send_icmp_response" (rect 4778 640 4903 652)(font "Arial" ))
+	(pt 4768 656)
+	(pt 4888 656)
+)
+(connector
+	(pt 2552 624)
+	(pt 2552 656)
+	(bus)
+)
+(connector
+	(pt 2568 608)
+	(pt 2568 640)
+)
+(connector
+	(pt 2896 544)
+	(pt 2896 656)
+	(bus)
+)
+(connector
+	(pt 2880 528)
+	(pt 2880 640)
+)
+(connector
+	(pt 2880 640)
+	(pt 2864 640)
+)
+(connector
+	(pt 2896 656)
+	(pt 2864 656)
+	(bus)
+)
+(connector
+	(pt 2584 1136)
+	(pt 2584 704)
+)
+(connector
+	(pt 2600 1152)
+	(pt 2600 720)
+	(bus)
+)
+(connector
+	(pt 2568 896)
+	(pt 2568 688)
+	(bus)
+)
+(connector
+	(pt 2552 880)
+	(pt 2552 672)
+)
+(connector
+	(pt 2568 640)
+	(pt 2664 640)
+)
+(connector
+	(pt 2552 656)
+	(pt 2664 656)
+	(bus)
+)
+(connector
+	(pt 2552 672)
+	(pt 2664 672)
+)
+(connector
+	(pt 2568 688)
+	(pt 2664 688)
+	(bus)
+)
+(connector
+	(pt 2584 704)
+	(pt 2664 704)
+)
+(connector
+	(pt 2600 720)
+	(pt 2664 720)
+	(bus)
+)
+(connector
+	(pt 2664 736)
+	(pt 2616 736)
+)
+(connector
+	(pt 2664 752)
+	(pt 2632 752)
+	(bus)
+)
+(connector
+	(pt 2536 1376)
+	(pt 2616 1376)
+)
+(connector
+	(pt 2616 736)
+	(pt 2616 1376)
+)
+(connector
+	(pt 2536 1392)
+	(pt 2632 1392)
+	(bus)
+)
+(connector
+	(pt 2632 752)
+	(pt 2632 1392)
+	(bus)
+)
+(connector
+	(text "icmp_dst_mac_address[47..0]" (rect 2144 1392 2292 1404)(font "Arial" ))
+	(pt 2288 1408)
+	(pt 2136 1408)
+	(bus)
+)
+(connector
+	(text "icmp_dst_ip_address[31..0]" (rect 2146 1408 2281 1420)(font "Arial" ))
+	(pt 2288 1424)
+	(pt 2136 1424)
+	(bus)
+)
+(connector
+	(text "eth_send_icmp_response" (rect 2146 1424 2271 1436)(font "Arial" ))
+	(pt 2288 1440)
+	(pt 2136 1440)
+)
+(connector
+	(pt 2288 1376)
+	(pt 2120 1376)
+	(bus)
+)
+(connector
+	(pt 2120 896)
+	(pt 2120 1152)
+	(bus)
+)
+(connector
+	(pt 2120 1152)
+	(pt 2120 1376)
+	(bus)
+)
+(connector
+	(pt 2288 1392)
+	(pt 2104 1392)
+	(bus)
+)
+(connector
+	(pt 2104 912)
+	(pt 2104 1168)
+	(bus)
+)
+(connector
+	(pt 2104 1168)
+	(pt 2104 1392)
+	(bus)
+)
+(connector
+	(text "mac_tx_clk" (rect 2146 1440 2202 1452)(font "Arial" ))
+	(pt 2288 1456)
+	(pt 2136 1456)
+)
+(connector
+	(text "mac_tx_busy" (rect 2146 1456 2213 1468)(font "Arial" ))
+	(pt 2288 1472)
+	(pt 2136 1472)
+)
+(connector
+	(text "mac_tx_byte_sent" (rect 2146 1472 2238 1484)(font "Arial" ))
+	(pt 2288 1488)
+	(pt 2136 1488)
+)
 (junction (pt 3336 576))
 (junction (pt 2120 896))
 (junction (pt 2120 560))
@@ -3658,6 +3860,8 @@ applicable agreement for further details.
 (junction (pt 2104 576))
 (junction (pt 2088 640))
 (junction (pt 2248 560))
+(junction (pt 2120 1152))
+(junction (pt 2104 1168))
 (text "COMAN disables all active circuitry to draw absolute minimum power" (rect 3152 888 3542 902)(font "Arial" (font_size 8)))
 (text "Collision-Detection" (rect 3296 1008 3399 1022)(font "Arial" (font_size 8)))
 (text "CRS = Carrier Sense" (rect 3296 992 3414 1006)(font "Arial" (font_size 8)))
@@ -3670,10 +3874,18 @@ applicable agreement for further details.
 (text "Periodic UDP Packet Sender" (rect 2336 800 2494 814)(font "Arial" (font_size 8)))
 (text "ARP Response Sender" (rect 2352 1056 2482 1070)(font "Arial" (font_size 8)))
 (text "ARP Request Sender" (rect 2352 1312 2472 1326)(font "Arial" (font_size 8)))
-(text "Only one sender is allowed to send so we can" (rect 2632 768 2898 782)(font "Arial" (font_size 8)))
-(text "combine all output signals to single ports" (rect 2632 784 2860 798)(font "Arial" (font_size 8)))
+(text "Only one sender is allowed to send so we can" (rect 2648 792 2914 806)(font "Arial" (font_size 8)))
+(text "combine all output signals to single ports" (rect 2648 808 2876 822)(font "Arial" (font_size 8)))
 (text "Here a 150byte frame is stored in RAM" (rect 3912 832 4132 846)(font "Arial" (font_size 8)))
+(text "Current MAC-Address: 00-1c-23-17-4a-cb" (rect 1840 240 2083 254)(font "Arial" (font_size 8)))
+(text "from Intel Triple Speed Ethernet Example" (rect 1840 256 2067 270)(font "Arial" (font_size 8)))
+(text "TODO: implement a kind of FIFO-buffer for the start-signals" (rect 2712 1208 3045 1222)(font "Arial" (font_size 8)))
+(text "of the individual packets Incoming ICMP-packets" (rect 2712 1224 2982 1238)(font "Arial" (font_size 8)))
+(text "can interfere with our UDP-payload-data" (rect 2712 1240 2942 1254)(font "Arial" (font_size 8)))
+(text "Maybe some kind of \"tx_rdy\" signal back to the packet-generators could work." (rect 2712 1272 3156 1286)(font "Arial" (font_size 8)))
+(text "If the flag is not set, we have to wait with the ICMP-response" (rect 2712 1288 3060 1302)(font "Arial" (font_size 8)))
+(text "ICMP Response Sender" (rect 2352 1520 2485 1534)(font "Arial" (font_size 8)))
 (rectangle (rect -248 256 408 952)(color 0 0 255)(line_width 3))
 (rectangle (rect 432 256 1640 952)(color 0 0 255)(line_width 3))
 (rectangle (rect 432 968 1640 1224)(color 0 0 255)(line_width 3))
-(rectangle (rect 1664 160 4984 1376)(color 0 0 255)(line_width 3))
+(rectangle (rect 1664 160 4984 1552)(color 0 0 255)(line_width 3))

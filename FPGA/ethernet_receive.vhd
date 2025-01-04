@@ -11,6 +11,9 @@ use ieee.std_logic_1164.all;
 use IEEE.NUMERIC_STD.ALL;
 
 entity ethernet_receive is 
+	generic(
+		lastRamAddress : integer := 100 -- more entries will use lots of FPGA-ressources. Better use a dedicated SD-RAM here instead
+	);
 	port
 	(
 		rx_clk				: in std_logic;
@@ -29,7 +32,7 @@ end entity;
 architecture Behavioral of ethernet_receive is
 	type t_SM_Ethernet is (s_Idle, s_Read, s_Done);
 	signal s_SM_Ethernet : t_SM_Ethernet := s_Idle;
-	signal ram_ptr 		: integer range 0 to 2048 := 0; -- we expecting not more than 2^11 bytes per frame
+	signal ram_ptr 		: integer range 0 to 2000 := 0; -- we expecting not more than 2^11 bytes per frame
 begin
 	process (rx_clk)
 	begin
@@ -47,11 +50,15 @@ begin
 					if (rx_frame = '1') then
 						if (rx_byte_received = '1') then
 							-- we received a valid byte
-							ram_addr <= to_unsigned(ram_ptr, 11);
-							ram_data <= rx_data;
+							if (ram_ptr <= lastRamAddress) then
+								ram_addr <= to_unsigned(ram_ptr, 11);
+								ram_data <= rx_data;
+							else
+								-- dont store received byte into ram as data is out of ram-size
+								-- we can store only "lastRamAddress" bytes
+							end if;
 
 							ram_ptr <= ram_ptr + 1;
-
 						else
 							-- data not valid -> just wait until rx_byte_received is reached
 							-- during this we keep the values on ram_addr and ram_data

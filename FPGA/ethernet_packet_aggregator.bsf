@@ -20,9 +20,9 @@ applicable agreement for further details.
 */
 (header "symbol" (version "1.1"))
 (symbol
-	(rect 16 16 216 160)
+	(rect 16 16 216 192)
 	(text "ethernet_packet_aggregator" (rect 5 0 117 12)(font "Arial" ))
-	(text "inst" (rect 8 128 20 140)(font "Arial" ))
+	(text "inst" (rect 8 160 20 172)(font "Arial" ))
 	(port
 		(pt 0 32)
 		(input)
@@ -66,6 +66,20 @@ applicable agreement for further details.
 		(line (pt 0 112)(pt 16 112)(line_width 3))
 	)
 	(port
+		(pt 0 128)
+		(input)
+		(text "tx_en3_i" (rect 0 0 34 12)(font "Arial" ))
+		(text "tx_en3_i" (rect 21 123 55 135)(font "Arial" ))
+		(line (pt 0 128)(pt 16 128)(line_width 1))
+	)
+	(port
+		(pt 0 144)
+		(input)
+		(text "data3_i[7..0]" (rect 0 0 48 12)(font "Arial" ))
+		(text "data3_i[7..0]" (rect 21 139 69 151)(font "Arial" ))
+		(line (pt 0 144)(pt 16 144)(line_width 3))
+	)
+	(port
 		(pt 200 32)
 		(output)
 		(text "tx_en_o" (rect 0 0 33 12)(font "Arial" ))
@@ -80,6 +94,6 @@ applicable agreement for further details.
 		(line (pt 200 48)(pt 184 48)(line_width 3))
 	)
 	(drawing
-		(rectangle (rect 16 16 184 128)(line_width 1))
+		(rectangle (rect 16 16 184 160)(line_width 1))
 	)
 )

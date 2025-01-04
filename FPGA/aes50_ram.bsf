@@ -68,22 +68,22 @@ applicable agreement for further details.
 	(port
 		(pt 248 32)
 		(output)
-		(text "dst_mac[47..0]" (rect 0 0 61 12)(font "Arial" ))
-		(text "dst_mac[47..0]" (rect 166 27 227 39)(font "Arial" ))
+		(text "pkt_dst_mac[47..0]" (rect 0 0 79 12)(font "Arial" ))
+		(text "pkt_dst_mac[47..0]" (rect 148 27 227 39)(font "Arial" ))
 		(line (pt 248 32)(pt 232 32)(line_width 3))
 	)
 	(port
 		(pt 248 48)
 		(output)
-		(text "src_mac[47..0]" (rect 0 0 62 12)(font "Arial" ))
-		(text "src_mac[47..0]" (rect 165 43 227 55)(font "Arial" ))
+		(text "pkt_src_mac[47..0]" (rect 0 0 80 12)(font "Arial" ))
+		(text "pkt_src_mac[47..0]" (rect 147 43 227 55)(font "Arial" ))
 		(line (pt 248 48)(pt 232 48)(line_width 3))
 	)
 	(port
 		(pt 248 64)
 		(output)
-		(text "packet_type[15..0]" (rect 0 0 73 12)(font "Arial" ))
-		(text "packet_type[15..0]" (rect 154 59 227 71)(font "Arial" ))
+		(text "pkt_type[15..0]" (rect 0 0 59 12)(font "Arial" ))
+		(text "pkt_type[15..0]" (rect 168 59 227 71)(font "Arial" ))
 		(line (pt 248 64)(pt 232 64)(line_width 3))
 	)
 	(port
@@ -158,7 +158,7 @@ applicable agreement for further details.
 	)
 	(parameter
 		"lastAddress"
-		"1531"
+		"100"
 		""
 		(type "PARAMETER_SIGNED_DEC")	)
 	(drawing

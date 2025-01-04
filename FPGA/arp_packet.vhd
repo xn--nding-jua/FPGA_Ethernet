@@ -40,30 +40,19 @@ architecture Behavioral of arp_packet is
 	signal arp_frame : t_ethernet_frame;
 
 	signal zframe_start	: std_logic;
-	signal var_start_frame : std_logic;
 begin
-	detect_frame_start_pos_edge : process(tx_clk)
-	begin
-		if falling_edge(tx_clk) then
-			zframe_start <= frame_start;
-			if frame_start = '1' and zframe_start = '0' then
-				var_start_frame <= '1';
-			else
-				var_start_frame <= '0';
-			end if;
-		end if;
-	end process;
-
 	process (tx_clk)
 	begin
+		zframe_start <= frame_start;
+
 		if (falling_edge(tx_clk)) then
-			if ((var_start_frame = '1') and (s_SM_Ethernet = s_Idle)) then
+			if ((frame_start = '1') and (zframe_start = '0') and (s_SM_Ethernet = s_Idle)) then
 				-- prepare begin of packet
 				tx_enable <= '0';
 				byte_counter <= 0;
 
 				-- source MAC address
-				arp_frame(6) <= src_mac_address(47 downto 40);
+				arp_frame(6) <= src_mac_address(47 downto 40); -- MSB contains typical left side of MAC
 				arp_frame(7) <= src_mac_address(39 downto 32);
 				arp_frame(8) <= src_mac_address(31 downto 24);
 				arp_frame(9) <= src_mac_address(23 downto 16);
@@ -80,7 +69,7 @@ begin
 				arp_frame(19) <= x"04"; -- size of protocol
 
 				-- source MAC address
-				arp_frame(22) <= src_mac_address(47 downto 40);
+				arp_frame(22) <= src_mac_address(47 downto 40); -- MSB contains typical left side of MAC
 				arp_frame(23) <= src_mac_address(39 downto 32);
 				arp_frame(24) <= src_mac_address(31 downto 24);
 				arp_frame(25) <= src_mac_address(23 downto 16);
@@ -88,13 +77,13 @@ begin
 				arp_frame(27) <= src_mac_address(7 downto 0);
 
 				-- source ip address
-				arp_frame(28) <= src_ip_address(31 downto 24);
+				arp_frame(28) <= src_ip_address(31 downto 24); -- MSB contains typical "192"
 				arp_frame(29) <= src_ip_address(23 downto 16);
 				arp_frame(30) <= src_ip_address(15 downto 8);
 				arp_frame(31) <= src_ip_address(7 downto 0);
 
 				-- destination MAC address
-				arp_frame(32) <= dst_mac_address(47 downto 40);
+				arp_frame(32) <= dst_mac_address(47 downto 40); -- MSB contains typical left side of MAC
 				arp_frame(33) <= dst_mac_address(39 downto 32);
 				arp_frame(34) <= dst_mac_address(31 downto 24);
 				arp_frame(35) <= dst_mac_address(23 downto 16);
@@ -102,7 +91,7 @@ begin
 				arp_frame(37) <= dst_mac_address(7 downto 0);
 
 				-- destination ip address
-				arp_frame(38) <= dst_ip_address(31 downto 24);
+				arp_frame(38) <= dst_ip_address(31 downto 24); -- MSB contains typical "192"
 				arp_frame(39) <= dst_ip_address(23 downto 16);
 				arp_frame(40) <= dst_ip_address(15 downto 8);
 				arp_frame(41) <= dst_ip_address(7 downto 0);
@@ -132,7 +121,7 @@ begin
 					tx_data <= dst_mac_address(47 downto 40);
 					
 					-- destination MAC address
-					arp_frame(0) <= dst_mac_address(47 downto 40);
+					arp_frame(0) <= dst_mac_address(47 downto 40); -- MSB contains typical left side of MAC
 					arp_frame(1) <= dst_mac_address(39 downto 32);
 					arp_frame(2) <= dst_mac_address(31 downto 24);
 					arp_frame(3) <= dst_mac_address(23 downto 16);
@@ -142,7 +131,7 @@ begin
 					arp_frame(20) <= x"00"; -- operations (0x0001 = ARP request, 0x0002 = ARP response)
 					arp_frame(21) <= x"02";
 
-					arp_frame(32) <= dst_mac_address(47 downto 40);
+					arp_frame(32) <= dst_mac_address(47 downto 40); -- MSB contains typical left side of MAC
 					arp_frame(33) <= dst_mac_address(39 downto 32);
 					arp_frame(34) <= dst_mac_address(31 downto 24);
 					arp_frame(35) <= dst_mac_address(23 downto 16);

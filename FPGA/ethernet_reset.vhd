@@ -14,25 +14,27 @@ use IEEE.NUMERIC_STD.ALL;
 entity ethernet_reset is 
 	port
 	(
-		clk			: in std_logic;
-		power_good	: in std_logic;
+		clk				: in std_logic;
+		power_good		: in std_logic;
 
-		phy_rstn		: out std_logic; -- reset for PHY
-		mac_rst		: out std_logic; -- reset for MAC
-		eth_rdy		: out std_logic
+		phy_rstn			: out std_logic; -- reset for PHY
+		mac_rst			: out std_logic; -- reset for MAC
+		sendArpRequest	: out std_logic
 	);
 end entity;
 
 architecture Behavioral of ethernet_reset is
-	type t_SM_Ethernet is (s_Wait, s_Reset, s_Wait2, s_Wait3, s_Done);
+	type t_SM_Ethernet is (s_Wait, s_Reset, s_Wait2, s_Wait3, s_Wait4, s_ArpRequest, s_Wait5, s_Done);
 	signal s_SM_Ethernet 	: t_SM_Ethernet := s_Wait;
-	signal counter : integer range 0 to 6 := 0;
+	signal counter : integer range 0 to 30000 := 0; -- allow up to 30 seconds
 begin
 	process (clk)
 	begin
 		if (rising_edge(clk)) then
 			if s_SM_Ethernet = s_Wait then
-				eth_rdy <= '0';
+				sendArpRequest <= '0';
+				phy_rstn <= '1';
+				mac_rst <= '0';
 				
 				if (power_good = '1') then
 					counter <= counter + 1;
@@ -69,11 +71,27 @@ begin
 				counter <= counter + 1;
 				-- wait 4 ms
 				if (counter > 4) then
-					s_SM_Ethernet <= s_Done;
+					counter <= 0;
+					s_SM_Ethernet <= s_Wait4;
 				end if;
 				
+			elsif s_SM_Ethernet = s_Wait4 then
+
+				counter <= counter + 1;
+				-- wait 10 seconds
+				if (counter > 10000) then
+					counter <= 0;
+					s_SM_Ethernet <= s_ArpRequest;
+				end if;
+
+			elsif s_SM_Ethernet = s_ArpRequest then
+				sendArpRequest <= '1';
+				s_SM_Ethernet <= s_Done;
+
 			elsif s_SM_Ethernet = s_Done then
-				eth_rdy <= '1';
+				sendArpRequest <= '0';
+				
+				-- stay here forever
 			end if;
 		end if;
 	end process;

@@ -59,6 +59,36 @@ applicable agreement for further details.
 		(line (pt 184 96)(pt 168 96)(line_width 3))
 	)
 	(parameter
+		"MAC0"
+		"0"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"MAC1"
+		"28"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"MAC2"
+		"35"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"MAC3"
+		"23"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"MAC4"
+		"74"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"MAC5"
+		"203"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
 		"IP0"
 		"192"
 		""

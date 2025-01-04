@@ -4,7 +4,7 @@ editor if you plan to continue editing the block that represents it in
 the Block Editor! File corruption is VERY likely to occur.
 */
 /*
-Copyright (C) 1991-2014 Altera Corporation
+Copyright (C) 1991-2013 Altera Corporation
 Your use of Altera Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
@@ -86,7 +86,13 @@ applicable agreement for further details.
 		(text "frame_rdy" (rect 191 75 235 87)(font "Arial" ))
 		(line (pt 256 80)(pt 240 80)(line_width 1))
 	)
+	(parameter
+		"lastRamAddress"
+		"100"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
 	(drawing
 		(rectangle (rect 16 16 240 128)(line_width 1))
 	)
+	(annotation_block (parameter)(rect 272 -64 372 16))
 )

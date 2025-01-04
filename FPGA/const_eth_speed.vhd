@@ -4,7 +4,7 @@
 -- MODULE: LPM_CONSTANT 
 
 -- ============================================================
--- File Name: const_ethspeed.vhd
+-- File Name: const_eth_speed.vhd
 -- Megafunction Name(s):
 -- 			LPM_CONSTANT
 --
@@ -39,15 +39,15 @@ USE ieee.std_logic_1164.all;
 LIBRARY lpm;
 USE lpm.all;
 
-ENTITY const_ethspeed IS
+ENTITY const_eth_speed IS
 	PORT
 	(
 		result		: OUT STD_LOGIC_VECTOR (1 DOWNTO 0)
 	);
-END const_ethspeed;
+END const_eth_speed;
 
 
-ARCHITECTURE SYN OF const_ethspeed IS
+ARCHITECTURE SYN OF const_eth_speed IS
 
 	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (1 DOWNTO 0);
 
@@ -101,9 +101,9 @@ END SYN;
 -- Retrieval info: CONSTANT: LPM_WIDTH NUMERIC "2"
 -- Retrieval info: USED_PORT: result 0 0 2 0 OUTPUT NODEFVAL "result[1..0]"
 -- Retrieval info: CONNECT: result 0 0 2 0 @result 0 0 2 0
--- Retrieval info: GEN_FILE: TYPE_NORMAL const_ethspeed.vhd TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL const_ethspeed.inc FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL const_ethspeed.cmp TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL const_ethspeed.bsf TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL const_ethspeed_inst.vhd FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL const_eth_speed.vhd TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL const_eth_speed.inc FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL const_eth_speed.cmp TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL const_eth_speed.bsf TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL const_eth_speed_inst.vhd FALSE
 -- Retrieval info: LIB_FILE: lpm

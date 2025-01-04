@@ -13,7 +13,7 @@
 --applicable agreement for further details.
 
 
-component const_ethspeed
+component const_eth_speed
 	PORT
 	(
 		result		: OUT STD_LOGIC_VECTOR (1 DOWNTO 0)

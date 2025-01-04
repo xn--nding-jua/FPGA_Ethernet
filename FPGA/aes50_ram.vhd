@@ -16,21 +16,36 @@ entity aes50_ram is
 		lastAddress : integer := 1531
 	);
 	port(
-		rx_clk		: in std_logic;
+		rx_clk			: in std_logic;
 		
-		writeAddr	: in unsigned(10 downto 0); -- 0..1531
-		data_in		: in unsigned(7 downto 0); -- 8 bit
+		writeAddr		: in unsigned(10 downto 0); -- 0..1531
+		data_in			: in std_logic_vector(7 downto 0); -- 8 bit
 
-		readAddr		: in unsigned(10 downto 0); -- 0..1531
-		data_out		: out unsigned(7 downto 0); -- 8 bit
+		dst_mac			: out std_logic_vector(47 downto 0); -- valid for all MAC-packets
+		src_mac			: out std_logic_vector(47 downto 0); -- valid for all MAC-packets
+		packet_type		: out std_logic_vector(15 downto 0); -- valid for all MAC-packets
+		arp_type			: out std_logic_vector(15 downto 0); -- only valid for ARP packages
+		arp_dst_ip		: out std_logic_vector(31 downto 0); -- only valid for ARP packages
+		arp_src_ip		: out std_logic_vector(31 downto 0); -- only valid for ARP packages
+		ip_type			: out std_logic_vector(7 downto 0);  -- valid for all IP-packets
+		udp_src_port	: out std_logic_vector(15 downto 0);
+		udp_dst_port	: out std_logic_vector(15 downto 0);
+		udp_length		: out std_logic_vector(15 downto 0);
+		
+		
+		read0Addr		: in unsigned(10 downto 0); -- 0..1531
+		data0_out		: out std_logic_vector(7 downto 0); -- 8 bit
 
-		readDbgAddr	: in unsigned(10 downto 0); -- 0..1531
-		dataDbg_out	: out unsigned(7 downto 0) -- 8 bit
+		read1Addr		: in unsigned(10 downto 0); -- 0..1531
+		data1_out		: out std_logic_vector(7 downto 0); -- 8 bit
+
+		read2Addr		: in unsigned(10 downto 0); -- 0..1531
+		data2_out		: out std_logic_vector(7 downto 0) -- 8 bit
 	);
 end aes50_ram;
 
 architecture Behavioral of aes50_ram is
-	type t_ram is array(lastAddress downto 0) of unsigned(7 downto 0);
+	type t_ram is array(lastAddress downto 0) of std_logic_vector(7 downto 0);
 	signal ram: t_ram;
 begin
 	-- writing data to ram
@@ -42,6 +57,18 @@ begin
 	end process;
 
 	-- continuously outputting data at specified address
-	data_out <= ram(to_integer(readAddr));
-	dataDbg_out <= ram(to_integer(readDbgAddr));
+	dst_mac <= ram(0) & ram(1) & ram(2) & ram(3) & ram(4) & ram(5);
+	src_mac <= ram(6) & ram(7) & ram(8) & ram(9) & ram(10) & ram(11);
+	packet_type <= ram(12) & ram(13);
+	arp_type <= ram(20) & ram(21);
+	arp_src_ip <= ram(28) & ram(29) & ram(30) & ram(31);
+	arp_dst_ip <= ram(38) & ram(39) & ram(40) & ram(41);
+	ip_type <= ram(23);
+	udp_src_port <= ram(34) & ram(35);
+	udp_dst_port <= ram(36) & ram(37);
+	udp_length <= ram(38) & ram(39);
+	
+	data0_out <= ram(to_integer(read0Addr));
+	data1_out <= ram(to_integer(read1Addr));
+	data2_out <= ram(to_integer(read2Addr));
 end Behavioral;

@@ -78,8 +78,8 @@ begin
 			elsif s_SM_Ethernet = s_Wait4 then
 
 				counter <= counter + 1;
-				-- wait 10 seconds
-				if (counter > 10000) then
+				-- wait 3 seconds
+				if (counter > 3000) then
 					counter <= 0;
 					s_SM_Ethernet <= s_ArpRequest;
 				end if;

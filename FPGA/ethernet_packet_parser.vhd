@@ -38,6 +38,8 @@ entity ethernet_packet_parser is
 		send_arp_response		: out std_logic;
 		icmp_dst_mac			: out std_logic_vector(47 downto 0);
 		icmp_dst_ip 			: out std_logic_vector(31 downto 0);
+		icmp_id					: out std_logic_vector(15 downto 0);
+		icmp_sequence			: out std_logic_vector(15 downto 0);
 		send_icmp_response	: out std_logic;
 		udp_payload				: out std_logic_vector(31 downto 0);
 		ram_read_address		: out unsigned(10 downto 0)
@@ -55,7 +57,9 @@ architecture Behavioral of ethernet_packet_parser is
 	
 	signal pkt_icmp_src_ip 		: std_logic_vector(31 downto 0);
 	signal pkt_icmp_dst_ip 		: std_logic_vector(31 downto 0);
-	signal pkt_icmp_type 		: std_logic_vector(15 downto 0);
+	signal pkt_icmp_type 		: std_logic_vector(7 downto 0);
+	signal pkt_icmp_id			: std_logic_vector(15 downto 0);
+	signal pkt_icmp_sequence	: std_logic_vector(15 downto 0);
 begin
 	-- frame_rdy comes from 25MHz domain, so we have to check for rising edge
 	detect_frame_rdy_pos_edge : process(clk)
@@ -76,21 +80,24 @@ begin
 			if ((frame_rdy_pos_edge = '1') and (s_SM_PacketParser = s_Idle)) then
 				-- a new frame has arrived
 				byte_counter <= 0;
+				send_arp_response <= '0';
+				send_icmp_response <= '0';
 				
 				-- check packet type
 				if (pkt_type = x"0800") then
 					-- we received IP packet
-					if (ip_type = x"11") then
-						-- we received an UDP packet
-						ram_read_address <= to_unsigned(42, 11); -- load ram-pointer to first payload-byte
-						s_SM_PacketParser <= s_ProcessUdpPacket;
-					elsif (ip_type = x"01") then
+					if (ip_type = x"01") then
 						-- we received an ICMP packet
 						ram_read_address <= to_unsigned(26, 11); -- load ram-pointer to first byte of source-ip-address
 						s_SM_PacketParser <= s_ProcessIcmpPacket;
 					elsif (ip_type = x"06") then
 						-- we received an TCP packet
+						-- at the moment we are not supporting TCP-packets in this design
 						s_SM_PacketParser <= s_UnexpectedPacket;
+					elsif (ip_type = x"11") then
+						-- we received an UDP packet
+						ram_read_address <= to_unsigned(42, 11); -- load ram-pointer to first payload-byte
+						s_SM_PacketParser <= s_ProcessUdpPacket;
 					else
 						-- no UDP packet
 						s_SM_PacketParser <= s_UnexpectedPacket;
@@ -99,11 +106,11 @@ begin
 				elsif (pkt_type = x"0806") then
 					-- we received ARP packet
 					
-					-- check type of ART packet
-					if (arp_type = x"01") then
+					-- check type of ART packet (opcode)
+					if (arp_type = x"0001") then
 						-- we received an ARP request
 						s_SM_PacketParser <= s_ProcessArpRequest;
-					elsif (arp_type = x"02") then
+					elsif (arp_type = x"0002") then
 						-- we received an ARP response
 						s_SM_PacketParser <= s_ProcessArpResponse;
 					else
@@ -140,16 +147,34 @@ begin
 					pkt_icmp_src_ip(31 - (byte_counter * 8) downto 24 - (byte_counter * 8)) <= ram_data;
 				elsif (byte_counter < 8) then -- read destination-ip
 					pkt_icmp_dst_ip(31 - ((byte_counter - 4) * 8) downto 24 - ((byte_counter - 4) * 8)) <= ram_data;
-				elsif (byte_counter < 10) then -- read ICMP-type
-					pkt_icmp_type(15 - ((byte_counter - 8) * 8) downto 8 - ((byte_counter - 8) * 8)) <= ram_data;
-				elsif (byte_counter = 10) then
-					if (pkt_icmp_type = x"0008") then
+				elsif (byte_counter = 8) then -- read ICMP-type
+					pkt_icmp_type(7 downto 0) <= ram_data;
+				elsif (byte_counter < 12) then
+					-- ignore ICMP-code and 2 bytes of checksum
+					-- byte_counter = 9
+					-- byte_counter = 10
+					-- byte_counter = 11
+				elsif (byte_counter < 14) then
+					-- byte_counter = 12..13
+					-- read ID
+					-- values, if ICMP-packet
+					pkt_icmp_id(15 - ((byte_counter - 12) * 8) downto 8 - ((byte_counter - 12) * 8)) <= ram_data;
+				elsif (byte_counter < 16) then
+					-- byte_counter = 14..15
+					-- read sequence
+					pkt_icmp_sequence(15 - ((byte_counter - 14) * 8) downto 8 - ((byte_counter - 14) * 8)) <= ram_data;
+				elsif (byte_counter = 16) then
+					if (pkt_icmp_type = x"08") then
 						-- we got a PING-Request. Send a PONG back to the source as destination
 						icmp_dst_mac <= pkt_src_mac;
 						icmp_dst_ip <= pkt_icmp_src_ip;
+						icmp_id <= pkt_icmp_id;
+						icmp_sequence <= pkt_icmp_sequence;
 						send_icmp_response <= '1';
 					end if;
-				else
+				elsif (byte_counter > 26) then
+					-- disable signal after 10 clocks = 125MHz / 10 = 12.5MHz
+				
 					send_icmp_response <= '0';
 					s_SM_PacketParser <= s_Done;
 				end if;
@@ -158,18 +183,18 @@ begin
 				byte_counter <= byte_counter + 1;
 
 			elsif (s_SM_PacketParser = s_ProcessArpRequest) then
-				-- check if this is a broadcast-message and if the IP is ours
-				if ((pkt_dst_mac = x"ffffffffffff") and (arp_dst_ip = ip_address)) then
-					if (byte_counter < 11) then
+				-- accept broadcast-message or to our specific MAC-address and check if the IP is ours
+				if (((pkt_dst_mac = x"ffffffffffff") or (pkt_dst_mac = mac_address)) and (arp_dst_ip = ip_address)) then
+					if (byte_counter = 0) then
 						arp_mac_address <= pkt_src_mac;
 						arp_ip_address <= arp_src_ip;
 							
 						-- rise arp-response-flag for 10 clocks = 125MHz / 10 = 12.5MHz
 						-- so that arp-sender can recognize this signal
 						send_arp_response <= '1';
-					else
+					elsif (byte_counter > 10) then
 						byte_counter <= 0;
-						send_arp_response <= '1';
+						send_arp_response <= '0';
 
 						s_SM_PacketParser <= s_Done;
 					end if;

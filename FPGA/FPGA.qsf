@@ -242,9 +242,9 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name VHDL_FILE arp_packet.vhd
 set_global_assignment -name VHDL_FILE const_eth_speed.vhd
 set_global_assignment -name VHDL_FILE udp_packet.vhd
-set_global_assignment -name VHDL_FILE ethernet_mac_quartus/utility.vhd
-set_global_assignment -name VHDL_FILE ethernet_mac_quartus/single_signal_synchronizer.vhd
-set_global_assignment -name VHDL_FILE ethernet_mac_quartus/mii_gmii_io.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/intel/utility.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/intel/single_signal_synchronizer.vhd
+set_global_assignment -name VHDL_FILE ethernet_mac/intel/mii_gmii_io.vhd
 set_global_assignment -name VHDL_FILE ethernet_mac/reset_generator.vhd
 set_global_assignment -name VHDL_FILE ethernet_mac/miim_types.vhd
 set_global_assignment -name VHDL_FILE ethernet_mac/miim_registers.vhd

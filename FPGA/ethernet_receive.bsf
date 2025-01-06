@@ -75,16 +75,16 @@ applicable agreement for further details.
 	(port
 		(pt 256 64)
 		(output)
-		(text "rx_byte_count[10..0]" (rect 0 0 82 12)(font "Arial" ))
-		(text "rx_byte_count[10..0]" (rect 153 59 235 71)(font "Arial" ))
-		(line (pt 256 64)(pt 240 64)(line_width 3))
+		(text "frame_rdy" (rect 0 0 44 12)(font "Arial" ))
+		(text "frame_rdy" (rect 191 59 235 71)(font "Arial" ))
+		(line (pt 256 64)(pt 240 64)(line_width 1))
 	)
 	(port
 		(pt 256 80)
 		(output)
-		(text "frame_rdy" (rect 0 0 44 12)(font "Arial" ))
-		(text "frame_rdy" (rect 191 75 235 87)(font "Arial" ))
-		(line (pt 256 80)(pt 240 80)(line_width 1))
+		(text "rx_byte_count[10..0]" (rect 0 0 82 12)(font "Arial" ))
+		(text "rx_byte_count[10..0]" (rect 153 75 235 87)(font "Arial" ))
+		(line (pt 256 80)(pt 240 80)(line_width 3))
 	)
 	(parameter
 		"lastRamAddress"

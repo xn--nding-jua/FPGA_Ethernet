@@ -24,8 +24,8 @@ entity ethernet_receive is
 
 		ram_addr				: out unsigned(10 downto 0); -- 11 bit to store one full fifo
 		ram_data				: out std_logic_vector(7 downto 0);
-		rx_byte_count		: out unsigned(10 downto 0);
-		frame_rdy			: out std_logic -- ready
+		frame_rdy			: out std_logic; -- ready
+		rx_byte_count		: out unsigned(10 downto 0)
 	);
 end entity;
 

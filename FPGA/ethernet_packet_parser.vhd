@@ -30,7 +30,7 @@ entity ethernet_packet_parser is
 		mac_address				: in std_logic_vector(47 downto 0);
 		ip_address				: in std_logic_vector(31 downto 0);
 		dst_ip_address			: in std_logic_vector(31 downto 0);
-		frame_rdy				: in std_logic;
+		sync_in					: in std_logic;
 		
 		dst_mac_address		: out std_logic_vector(47 downto 0);
 		arp_mac_address		: out std_logic_vector(47 downto 0);
@@ -52,8 +52,7 @@ architecture Behavioral of ethernet_packet_parser is
 
 	signal byte_counter			: integer range 0 to 1500 := 0;
 	
-	signal zframe_rdy				: std_logic;
-	signal frame_rdy_pos_edge	: std_logic;
+	signal zsync_in				: std_logic;
 	
 	signal pkt_icmp_src_ip 		: std_logic_vector(31 downto 0);
 	signal pkt_icmp_dst_ip 		: std_logic_vector(31 downto 0);
@@ -61,23 +60,13 @@ architecture Behavioral of ethernet_packet_parser is
 	signal pkt_icmp_id			: std_logic_vector(15 downto 0);
 	signal pkt_icmp_sequence	: std_logic_vector(15 downto 0);
 begin
-	-- frame_rdy comes from 25MHz domain, so we have to check for rising edge
-	detect_frame_rdy_pos_edge : process(clk)
-	begin
-		if rising_edge(clk) then
-			zframe_rdy <= frame_rdy;
-			if frame_rdy = '1' and zframe_rdy = '0' then
-				frame_rdy_pos_edge <= '1';
-			else
-				frame_rdy_pos_edge <= '0';
-			end if;
-		end if;
-	end process;
-
 	process (clk)
 	begin
 		if (rising_edge(clk)) then
-			if ((frame_rdy_pos_edge = '1') and (s_SM_PacketParser = s_Idle)) then
+			-- sync_in comes from 25MHz domain when in 100Mbps mode, so we have to check for rising edge
+			zsync_in <= sync_in;
+			
+			if ((sync_in = '1') and (zsync_in = '0') and (s_SM_PacketParser = s_Idle)) then
 				-- a new frame has arrived
 				byte_counter <= 0;
 				send_arp_response <= '0';

@@ -38,31 +38,21 @@ architecture Behavioral of icmp_packet is
 	constant ICMP_PAYLOAD_LENGTH	: integer := 32;
 	constant PACKET_LENGTH			: integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + ICMP_LENGTH + ICMP_PAYLOAD_LENGTH;
 
-	-- Functions
-	--function log2(A: integer) return integer is
-	--begin
-	--	for I in 1 to 30 loop  -- Works for up to 32 bit integers
-	--		if(2**I > A) then return(I-1);  end if;
-	--	end loop;
-	--	return(30);
-	--end;
-
 	type t_SM_Ethernet is (s_Idle, s_Start, s_Wait, s_Transmit, s_End);
 	signal s_SM_Ethernet					: t_SM_Ethernet := s_Idle;
 	signal byte_counter					: integer range 0 to (PACKET_LENGTH + 1);
+	signal packet_counter				: integer range 0 to 65535 := 1;
 
 	-- Checksum calculation
 	signal checksum						: unsigned(15 downto 0) := (others => '0');
 	signal checksum_tmp					: unsigned(31 downto 0) := (others => '0');
-	--signal checksum_byte_count			: unsigned(log2(IP_HEADER_LENGTH) - 1 downto 0)  := (others => '0');
 	signal checksum_byte_count			: integer range 0 to IP_HEADER_LENGTH + 2;
 	signal calculating_checksum		: std_logic := '0';
 	signal calc_new_checksum			: std_logic := '0';
 
 	signal icmp_checksum					: unsigned(15 downto 0) := (others => '0');
 	signal icmp_checksum_tmp			: unsigned(31 downto 0) := (others => '0'); -- enough headroom for longer messages
-	--signal icmp_checksum_byte_count	: unsigned(log2(ICMP_LENGTH + ICMP_PAYLOAD_LENGTH) - 1 downto 0)  := (others => '0');
-	signal icmp_checksum_byte_count	: integer range 0 to 100;--ICMP_LENGTH + ICMP_PAYLOAD_LENGTH + 2;
+	signal icmp_checksum_byte_count	: integer range 0 to ICMP_PAYLOAD_LENGTH + 2;
 	signal icmp_calculating_checksum	: std_logic := '0';
 	signal icmp_calc_new_checksum		: std_logic := '0';
 
@@ -78,6 +68,7 @@ begin
 			
 			if ((frame_start = '1') and (zframe_start = '0') and (s_SM_Ethernet = s_Idle)) then
 				-- prepare begin of packet
+				packet_counter <= packet_counter + 1; -- increment packet counter
 				tx_enable <= '0';
 				byte_counter <= 0;
 				tx_data <= dst_mac_address(47 downto 40);
@@ -108,13 +99,13 @@ begin
 				-- IP HEADER (20 bytes)
 				icmp_frame(14) <= x"45"; -- b14 = version (4-bit) | internet header length (4-bit) [Version 4 and header length of 0x05 = 20 bytes]
 				icmp_frame(15) <= x"00"; -- differentiated services (6-bits) | explicit congestion notification (2-bits)
-				icmp_frame(16) <= x"00"; -- total length without MAC-header: entire packet size in bytes, including IP-header and payload-data. The minimum size is 46 bytes of user data (= 0x2e, header without data) and the maximum is 65,535 bytes
-				icmp_frame(17) <= x"3c"; -- 20 bytes IP-header + 8 bytes ICMP-header + 32 bytes ICMP-payload = 60 bytes = 0x003c
-				icmp_frame(18) <= x"00"; -- identification (primarily used for uniquely identifying the group of fragments of a single IP datagram) [set to 0x0001 as 0x0000 will be ignored by windows]
-				icmp_frame(19) <= x"01";
+				icmp_frame(16) <= std_logic_vector(to_unsigned(IP_HEADER_LENGTH + ICMP_LENGTH + ICMP_PAYLOAD_LENGTH, 16)(15 downto 8)); -- total length without MAC-header: entire packet size in bytes, including IP-header and payload-data. The minimum size is 46 bytes of user data (= 0x2e, header without data) and the maximum is 65,535 bytes
+				icmp_frame(17) <= std_logic_vector(to_unsigned(IP_HEADER_LENGTH + ICMP_LENGTH + ICMP_PAYLOAD_LENGTH, 16)(7 downto 0)); -- 20 bytes IP-header + 8 bytes ICMP-header + 32 bytes ICMP-payload = 60 bytes = 0x003c
+				icmp_frame(18) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8); -- identification (primarily used for uniquely identifying the group of fragments of a single IP datagram) [0x0000 will be ignored by windows, so we set the packet_counter to this value in the next step]
+				icmp_frame(19) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);
 				icmp_frame(20) <= x"00"; -- flags (3-bits) | fragment offsets (13-bits)
 				icmp_frame(21) <= x"00";
-				icmp_frame(22) <= x"80"; -- time to live (0x80 = 128)
+				icmp_frame(22) <= x"40"; -- time to live (0x40 = 64)
 				icmp_frame(23) <= x"01"; -- b23 = protocol (0x01 = ICMP, 0x06 = TCP, 0x11 = UDP)
 				icmp_frame(24) <= x"00"; -- header checksum (16-bit ones' complement of the ones' complement sum of all 16-bit words in the header)
 				icmp_frame(25) <= x"00";
@@ -174,24 +165,25 @@ begin
 				icmp_frame(72) <= x"68"; -- h
 				icmp_frame(73) <= x"69"; -- i
 
+				calc_new_checksum <= '1'; -- calculate new checksum for IP-HEADER
+				icmp_calc_new_checksum <= '1'; -- calculate new checksum for ICMP-Part
+
 				s_SM_Ethernet <= s_Start;
 				
 			elsif (s_SM_Ethernet = s_Start) then
+				calc_new_checksum <= '0';
+				icmp_calc_new_checksum <= '0';
+
 				-- wait until MAC is ready again
 				if (tx_busy = '0') then
 					tx_enable <= '1';
 					byte_counter <= 0; -- preload to first byte again
 					tx_data <= icmp_frame(0);
-					calc_new_checksum <= '1'; -- calculate new checksum for IP-HEADER
-					icmp_calc_new_checksum <= '1'; -- calculate new checksum for ICMP-Part
-					
+
 					s_SM_Ethernet <= s_Transmit;
 				end if;
 			
 			elsif (s_SM_Ethernet = s_Transmit) then
-				calc_new_checksum <= '0';
-				icmp_calc_new_checksum <= '0';
-
 				-- insert CRC checksum into header when ready
 				if (calculating_checksum = '0') then
 					icmp_frame(MAC_HEADER_LENGTH + 10) <= std_logic_vector(checksum(15 downto 8)); -- MSB
@@ -226,46 +218,42 @@ begin
 		end if;
 	end process;
 
-	-----------------------------------------------------------------
-	HEADER_CHECKSUM : process (tx_clk)
-		variable Word: std_logic_vector(16 downto 0);
+	HEADER_CHECKSUM_CALC : process (tx_clk)
+		variable Word: std_logic_vector(15 downto 0);
 	begin
 		if falling_edge(tx_clk) then
-			if calc_new_checksum = '1' and calculating_checksum = '0' then
+			if ((calc_new_checksum = '1') and (calculating_checksum = '0')) then
 				calculating_checksum    <= '1';
 				checksum_tmp            <= (others => '0');
 				checksum_byte_count     <= 0;
-			elsif calculating_checksum = '1' and checksum_byte_count < IP_HEADER_LENGTH then
-				Word                    := "0" & icmp_frame(MAC_HEADER_LENGTH + checksum_byte_count) & icmp_frame(MAC_HEADER_LENGTH + checksum_byte_count + 1);
-				checksum_tmp            <= checksum_tmp + unsigned(Word);
+			elsif ((calculating_checksum = '1') and (checksum_byte_count < IP_HEADER_LENGTH)) then
+				Word                    := icmp_frame(MAC_HEADER_LENGTH + checksum_byte_count) & icmp_frame(MAC_HEADER_LENGTH + checksum_byte_count + 1);
+				checksum_tmp            <= checksum_tmp + resize(unsigned(Word), 32);
 				checksum_byte_count     <= checksum_byte_count + 2; -- we are reading two bytes at once
 			else
-				checksum <= x"ffff" - (checksum_tmp(15 downto 0) + checksum_tmp(31 downto 16)); -- add carryover above 16th bit to 16-bit CRC
-				calculating_checksum <= '0';
-				checksum_byte_count <= 0;
+				checksum                <= x"ffff" - (checksum_tmp(15 downto 0) + checksum_tmp(31 downto 16)); -- add carryover above 16th bit to 16-bit CRC
+				checksum_byte_count     <= 0;
+				calculating_checksum    <= '0';
 			end if;
 		end if;
-	end process HEADER_CHECKSUM;
+	end process HEADER_CHECKSUM_CALC;
 
-	-----------------------------------------------------------------
 	ICMP_CHECKSUM_CALC : process (tx_clk)
-		variable Word: std_logic_vector(31 downto 0);
-		variable Word2: std_logic_vector(15 downto 0);
+		variable Word: std_logic_vector(15 downto 0);
 	begin
 		if falling_edge(tx_clk) then
 			if ((icmp_calc_new_checksum = '1') and (icmp_calculating_checksum = '0')) then
 				icmp_calculating_checksum    <= '1';
-				icmp_checksum_tmp            <= (others => '0');
+				icmp_checksum_tmp            <= resize(unsigned(icmp_sequence(15 downto 0)), 32) + resize(unsigned(icmp_id(15 downto 0)), 32);
 				icmp_checksum_byte_count     <= 0;
-			elsif ((icmp_calculating_checksum = '1') and (icmp_checksum_byte_count < (ICMP_LENGTH + ICMP_PAYLOAD_LENGTH))) then
-				Word                         := "0000000000000000" & icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + icmp_checksum_byte_count) & icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + icmp_checksum_byte_count + 1);
-				icmp_checksum_tmp            <= icmp_checksum_tmp + unsigned(Word);
+			elsif ((icmp_calculating_checksum = '1') and (icmp_checksum_byte_count < ICMP_PAYLOAD_LENGTH)) then
+				Word                         := icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + ICMP_LENGTH + icmp_checksum_byte_count) & icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + ICMP_LENGTH + icmp_checksum_byte_count + 1);
+				icmp_checksum_tmp            <= icmp_checksum_tmp + resize(unsigned(Word), 32);
 				icmp_checksum_byte_count     <= icmp_checksum_byte_count + 2; -- we are reading two bytes at once
 			else
-				Word2 := icmp_frame(40) & icmp_frame(41);
-				icmp_checksum <= x"ffff" - (icmp_checksum_tmp(15 downto 0) + icmp_checksum_tmp(31 downto 16) + unsigned(Word2) + 1); -- add carryover above 16th bit to 16-bit CRC
-				icmp_calculating_checksum <= '0';
-				icmp_checksum_byte_count <= 0;
+				icmp_checksum                <= x"ffff" - (icmp_checksum_tmp(15 downto 0) + icmp_checksum_tmp(31 downto 16)); -- add carryover above 16th bit to 16-bit CRC
+				icmp_checksum_byte_count     <= 0;
+				icmp_calculating_checksum    <= '0';
 			end if;
 		end if;
 	end process ICMP_CHECKSUM_CALC;

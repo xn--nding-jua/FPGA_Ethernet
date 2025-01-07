@@ -42,6 +42,7 @@ entity ethernet_packet_parser is
 		icmp_sequence			: out std_logic_vector(15 downto 0);
 		send_icmp_response	: out std_logic;
 		udp_payload				: out std_logic_vector(31 downto 0);
+		send_udp_response		: out std_logic;
 		ram_read_address		: out unsigned(10 downto 0)
 	);
 end entity;
@@ -119,11 +120,14 @@ begin
 				
 				--if (byte_counter < (udp_length - 8)) then
 				if (byte_counter < 4) then -- just read the first 4 bytes
+					send_udp_response <= '1';
+				
 					--udp_payload((byte_counter + 1) * 8 - 1 downto (byte_counter * 8)) <= ram_data;
 					udp_payload(31 - (byte_counter * 8) downto 24 - (byte_counter * 8)) <= ram_data;
 					ram_read_address <= to_unsigned(43 + byte_counter, 11); -- load next payload-byte
-				else
+				elsif (byte_counter > 15) then
 					-- we've read the payload-data and finished the work
+					send_udp_response <= '0';
 					s_SM_PacketParser <= s_Done;
 				end if;
 				
@@ -133,22 +137,28 @@ begin
 				-- we have to load 4 bytes for source-ip, 4 bytes for destination-ip
 				-- and two bytes for the ICMP-type. We ignore the "CODE"-word and CRC for now
 				if (byte_counter < 4) then -- read source-ip
+					-- ram-addresses 26..29
 					pkt_icmp_src_ip(31 - (byte_counter * 8) downto 24 - (byte_counter * 8)) <= ram_data;
 				elsif (byte_counter < 8) then -- read destination-ip
+					-- ram-addresses 30..33
 					pkt_icmp_dst_ip(31 - ((byte_counter - 4) * 8) downto 24 - ((byte_counter - 4) * 8)) <= ram_data;
 				elsif (byte_counter = 8) then -- read ICMP-type
+					-- ram-addresses 34
 					pkt_icmp_type(7 downto 0) <= ram_data;
 				elsif (byte_counter < 12) then
+					-- ram-addresses 35..37
 					-- ignore ICMP-code and 2 bytes of checksum
 					-- byte_counter = 9
 					-- byte_counter = 10
 					-- byte_counter = 11
 				elsif (byte_counter < 14) then
+					-- ram-addresses 38..39
 					-- byte_counter = 12..13
 					-- read ID
 					-- values, if ICMP-packet
 					pkt_icmp_id(15 - ((byte_counter - 12) * 8) downto 8 - ((byte_counter - 12) * 8)) <= ram_data;
 				elsif (byte_counter < 16) then
+					-- ram-addresses 40..41
 					-- byte_counter = 14..15
 					-- read sequence
 					pkt_icmp_sequence(15 - ((byte_counter - 14) * 8) downto 8 - ((byte_counter - 14) * 8)) <= ram_data;

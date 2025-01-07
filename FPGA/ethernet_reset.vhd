@@ -19,7 +19,8 @@ entity ethernet_reset is
 
 		phy_rstn			: out std_logic; -- reset for PHY
 		mac_rst			: out std_logic; -- reset for MAC
-		sendArpRequest	: out std_logic
+		sendArpRequest	: out std_logic;
+		tx_online		: out std_logic
 	);
 end entity;
 
@@ -35,6 +36,7 @@ begin
 				sendArpRequest <= '0';
 				phy_rstn <= '1';
 				mac_rst <= '0';
+				tx_online <= '0';
 				
 				if (power_good = '1') then
 					counter <= counter + 1;
@@ -86,11 +88,21 @@ begin
 
 			elsif s_SM_Ethernet = s_ArpRequest then
 				sendArpRequest <= '1';
-				s_SM_Ethernet <= s_Done;
+				counter <= 0;
+				s_SM_Ethernet <= s_Wait5;
 
-			elsif s_SM_Ethernet = s_Done then
+			elsif s_SM_Ethernet = s_Wait5 then
 				sendArpRequest <= '0';
 				
+				counter <= counter + 1;
+				-- wait 5 seconds
+				if (counter > 5000) then
+					counter <= 0;
+					s_SM_Ethernet <= s_Done;
+				end if;
+
+			elsif s_SM_Ethernet = s_Done then
+				tx_online <= '1';
 				-- stay here forever
 			end if;
 		end if;

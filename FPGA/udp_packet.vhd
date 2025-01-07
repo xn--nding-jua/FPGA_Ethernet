@@ -39,33 +39,31 @@ end entity;
 
 architecture Behavioral of udp_packet is
 	-- Constants
-	constant MAC_HEADER_LENGTH		: integer := 14;
-	constant IP_HEADER_LENGTH		: integer := 5 * (32 / 8); -- Header length always 20 bytes (5 * 32 bit words)
-	constant UDP_HEADER_LENGTH		: integer := 8;
-	constant PAYLOAD_LENGTH			: integer := 18;
-	constant PACKET_LENGTH			: integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + PAYLOAD_LENGTH;
-
-	-- Functions
-	function log2(A: integer) return integer is
-	begin
-		for I in 1 to 30 loop  -- Works for up to 32 bit integers
-			if(2**I > A) then return(I-1);  end if;
-		end loop;
-		return(30);
-	end;
+	constant MAC_HEADER_LENGTH			: integer := 14;
+	constant IP_HEADER_LENGTH			: integer := 5 * (32 / 8); -- Header length always 20 bytes (5 * 32 bit words)
+	constant UDP_PSEUDO_HEADER_LENGTH: integer := 8;
+	constant UDP_HEADER_LENGTH			: integer := 8;
+	constant UDP_PAYLOAD_LENGTH		: integer := 18;
+	constant PACKET_LENGTH				: integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH;
 
 	-- Checksum calculation
-	signal checksum					: unsigned(15 downto 0) := (others => '0');
-	signal checksum16					: unsigned(16 downto 0) := (others => '0');
-	signal checksum_byte_count		: unsigned(log2(IP_HEADER_LENGTH) - 1 downto 0)  := (others => '0');
-	signal calculating_checksum	: std_logic := '0';
-	signal calc_new_checksum		: std_logic := '0';
+	signal checksum						: unsigned(15 downto 0) := (others => '0');
+	signal checksum_tmp					: unsigned(31 downto 0) := (others => '0');
+	signal checksum_byte_count			: integer range 0 to IP_HEADER_LENGTH + 2;
+	signal calculating_checksum		: std_logic := '0';
+	signal calc_new_checksum			: std_logic := '0';
+
+	signal udp_checksum					: unsigned(15 downto 0) := (others => '0');
+	signal udp_checksum_tmp				: unsigned(31 downto 0) := (others => '0');
+	signal udp_checksum_byte_count	: integer range 0 to UDP_PSEUDO_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH + 2;
+	signal udp_calculating_checksum	: std_logic := '0';
+	signal udp_calc_new_checksum		: std_logic := '0';
 
 	-- Other signals used in this file
 	type t_SM_Ethernet is (s_Idle, s_Start, s_Wait, s_Transmit, s_End);
-	signal s_SM_Ethernet				: t_SM_Ethernet := s_Idle;
-	signal byte_counter				: integer range 0 to 1600 := 0; -- one ethernet-frame cannot take more than 1500 bytes + header
-	signal packet_counter			: integer range 0 to 65535 := 0;
+	signal s_SM_Ethernet					: t_SM_Ethernet := s_Idle;
+	signal byte_counter					: integer range 0 to 1600 := 0; -- one ethernet-frame cannot take more than 1500 bytes + header
+	signal packet_counter				: integer range 0 to 65535 := 1;
 
 	type t_ethernet_frame is array (0 to PACKET_LENGTH - 1) of std_logic_vector(7 downto 0);
 	signal udp_frame		: t_ethernet_frame;
@@ -83,7 +81,6 @@ begin
 				tx_enable <= '0';
 				byte_counter <= 0;
 				tx_data <= dst_mac_address(47 downto 40);
-
 
 				-- 7 preamble bytes + SFD will be added by Ethernet-MAC
 				
@@ -110,10 +107,10 @@ begin
 				-- IP HEADER (20 bytes)
 				udp_frame(14) <= x"45"; -- b14 = version (4-bit) | internet header length (4-bit) [Version 4 and header length of 0x05 = 20 bytes]
 				udp_frame(15) <= x"00"; -- differentiated services (6-bits) | explicit congestion notification (2-bits)
-				udp_frame(16) <= x"00"; -- total length without MAC-header: entire packet size in bytes, including IP-header and payload-data. The minimum size is 46 bytes of user data (= 0x2e, header without data) and the maximum is 65,535 bytes
-				udp_frame(17) <= x"2e"; -- 20 bytes IP-header + 8 bytes UDP-header + 18 bytes UDP-payload = 46 bytes = 0x002e
-				udp_frame(18) <= x"00"; -- identification (primarily used for uniquely identifying the group of fragments of a single IP datagram) [set to 0x0001 as 0x0000 will be ignored by windows]
-				udp_frame(19) <= x"01";
+				udp_frame(16) <= std_logic_vector(to_unsigned(IP_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH, 16)(15 downto 8)); -- total length without MAC-header: entire packet size in bytes, including IP-header and payload-data. The minimum size is 46 bytes of user data (= 0x2e, header without data) and the maximum is 65,535 bytes
+				udp_frame(17) <= std_logic_vector(to_unsigned(IP_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH, 16)(7 downto 0)); -- 20 bytes IP-header + 8 bytes UDP-header + 18 bytes UDP-payload = 46 bytes = 0x002e
+				udp_frame(18) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8); -- identification (primarily used for uniquely identifying the group of fragments of a single IP datagram) [0x0000 will be ignored by windows, so we set the packet_counter to this value in the next step]
+				udp_frame(19) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);
 				udp_frame(20) <= x"00"; -- flags (3-bits) | fragment offsets (13-bits)
 				udp_frame(21) <= x"00";
 				udp_frame(22) <= x"80"; -- time to live (0x80 = 128)
@@ -137,8 +134,8 @@ begin
 				udp_frame(35) <= src_udp_port(7 downto 0);
 				udp_frame(36) <= dst_udp_port(15 downto 8);
 				udp_frame(37) <= dst_udp_port(7 downto 0);
-				udp_frame(38) <= x"00"; -- length (length of this UDP packet including header and data. Minimum 8 bytes)
-				udp_frame(39) <= x"14";
+				udp_frame(38) <= std_logic_vector(to_unsigned(UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH, 16)(15 downto 8)); -- length (length of this UDP packet including header and data. Minimum 8 bytes)
+				udp_frame(39) <= std_logic_vector(to_unsigned(UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH, 16)(7 downto 0));
 				udp_frame(40) <= x"00"; -- checksum (0 is a valid CRC-value to ignore it)
 				udp_frame(41) <= x"00";
 
@@ -162,30 +159,34 @@ begin
 				udp_frame(58) <= x"33"; -- 3
 				udp_frame(59) <= x"34"; -- 4
 				
+				calc_new_checksum <= '1'; -- calculate new checksum
+				udp_calc_new_checksum <= '1'; -- calculate new checksum for udp packet
+
 				s_SM_Ethernet <= s_Start;
 				
 			elsif (s_SM_Ethernet = s_Start) then
+				calc_new_checksum <= '0';
+				udp_calc_new_checksum <= '0';
+
 				-- wait until MAC is ready again
 				if (tx_busy = '0') then
 					tx_enable <= '1';
 					byte_counter <= 0; -- preload to first byte again
 					tx_data <= udp_frame(0);
-					calc_new_checksum <= '1'; -- calculate new checksum
-					
-					-- insert packet_counter to frame
-					udp_frame(MAC_HEADER_LENGTH + 4) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8);
-					udp_frame(MAC_HEADER_LENGTH + 5) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);
-
 					s_SM_Ethernet <= s_Transmit;
 				end if;
 			
 			elsif (s_SM_Ethernet = s_Transmit) then
-				calc_new_checksum <= '0';
-
 				-- insert CRC checksum into header when ready
 				if (calculating_checksum = '0') then
 					udp_frame(MAC_HEADER_LENGTH + 10) <= std_logic_vector(checksum(15 downto 8)); -- MSB
 					udp_frame(MAC_HEADER_LENGTH + 11) <= std_logic_vector(checksum(7 downto 0)); -- LSB
+				end if;
+
+				-- insert CRC checksum into header when ready
+				if (udp_calculating_checksum = '0') then
+					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 6) <= std_logic_vector(udp_checksum(15 downto 8)); -- MSB
+					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 7) <= std_logic_vector(udp_checksum(7 downto 0)); -- LSB
 				end if;
 
 				-- wait until previous byte is sent
@@ -210,25 +211,43 @@ begin
 		end if;
 	end process;
 
-	-- Checksum-calculation (c) 2012 by Peter A Bennett
-	-- Add in the carry for ones complement addition.
-	checksum <= checksum16(15 downto 0) + ("000000000000000" & checksum16(16)); -- add the carry-bit to the beginning
-	-----------------------------------------------------------------
-	HEADER_CHECKSUM : process (tx_clk)
-		variable Word: std_logic_vector(16 downto 0);
+	HEADER_CHECKSUM_CALC : process (tx_clk)
+		variable Word: std_logic_vector(15 downto 0);
 	begin
 		if falling_edge(tx_clk) then
-			if calc_new_checksum = '1' and calculating_checksum = '0' then
-				calculating_checksum <= '1';
-				checksum16              <= (others => '0');
-				checksum_byte_count     <= (others => '0');
-			elsif calculating_checksum = '1' and checksum_byte_count < IP_HEADER_LENGTH then
-				Word                    := "0" & udp_frame(to_integer(MAC_HEADER_LENGTH + checksum_byte_count)) & udp_frame(to_integer(MAC_HEADER_LENGTH + checksum_byte_count + 1));
-				checksum16              <= ('0' & checksum) + unsigned(Word);
+			if ((calc_new_checksum = '1') and (calculating_checksum = '0')) then
+				calculating_checksum    <= '1';
+				checksum_tmp            <= (others => '0');
+				checksum_byte_count     <= 0;
+			elsif ((calculating_checksum = '1') and (checksum_byte_count < IP_HEADER_LENGTH)) then
+				Word                    := udp_frame(MAC_HEADER_LENGTH + checksum_byte_count) & udp_frame(MAC_HEADER_LENGTH + checksum_byte_count + 1);
+				checksum_tmp            <= checksum_tmp + resize(unsigned(Word), 32);
 				checksum_byte_count     <= checksum_byte_count + 2; -- we are reading two bytes at once
 			else
-				calculating_checksum <= '0';
+				checksum                <= x"ffff" - (checksum_tmp(15 downto 0) + checksum_tmp(31 downto 16)); -- add carryover above 16th bit to 16-bit CRC
+				checksum_byte_count     <= 0;
+				calculating_checksum    <= '0';
 			end if;
 		end if;
-	end process HEADER_CHECKSUM;
+	end process HEADER_CHECKSUM_CALC;
+	
+	UDP_CHECKSUM_CALC : process (tx_clk)
+		variable Word: std_logic_vector(15 downto 0);
+	begin
+		if falling_edge(tx_clk) then
+			if ((udp_calc_new_checksum = '1') and (udp_calculating_checksum = '0')) then
+				udp_calculating_checksum    <= '1';
+				udp_checksum_tmp            <= to_unsigned(17 + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH, 32); -- 0x11 (protocol) + UDP-LENGTH (header+payload)
+				udp_checksum_byte_count     <= 0;
+			elsif ((udp_calculating_checksum = '1') and (udp_checksum_byte_count < (UDP_PSEUDO_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH))) then
+				Word                        := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1);
+				udp_checksum_tmp            <= udp_checksum_tmp + resize(unsigned(Word), 32);
+				udp_checksum_byte_count     <= udp_checksum_byte_count + 2; -- we are reading two bytes at once
+			else
+				udp_checksum                <= x"ffff" - (udp_checksum_tmp(15 downto 0) + udp_checksum_tmp(31 downto 16)); -- add carryover above 16th bit to 16-bit CRC
+				udp_checksum_byte_count     <= 0;
+				udp_calculating_checksum    <= '0';
+			end if;
+		end if;
+	end process UDP_CHECKSUM_CALC;
 end Behavioral;

@@ -30,7 +30,7 @@ entity ethernet_receive is
 end entity;
 
 architecture Behavioral of ethernet_receive is
-	type t_SM_Ethernet is (s_Idle, s_Read, s_Done);
+	type t_SM_Ethernet is (s_Idle, s_Read, s_FrameRdy, s_Done);
 	signal s_SM_Ethernet : t_SM_Ethernet := s_Idle;
 	signal ram_ptr 		: integer range 0 to 2000 := 0; -- we expecting not more than 2^11 bytes per frame
 begin
@@ -66,17 +66,19 @@ begin
 						end if;
 					else
 						-- end of frame
-						
-						-- set signal, that frame in RAM is completed
-						rx_byte_count <= to_unsigned(ram_ptr, 11);
-						frame_rdy <= '1';
-						
-						s_SM_Ethernet <= s_Done;
+						s_SM_Ethernet <= s_FrameRdy;
 					end if;
 				else
 					-- an error occured
 					s_SM_Ethernet <= s_Done;
 				end if;
+
+			elsif (s_SM_Ethernet = s_FrameRdy) then
+				-- set signal, that frame in RAM is completed
+				rx_byte_count <= to_unsigned(ram_ptr, 11);
+				frame_rdy <= '1';
+				
+				s_SM_Ethernet <= s_Done;
 
 			elsif (s_SM_Ethernet = s_Done) then
 				frame_rdy <= '0';

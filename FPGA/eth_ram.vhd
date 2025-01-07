@@ -11,7 +11,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity aes50_ram is
+entity eth_ram is
 	generic(
 		lastAddress : integer := 100 -- more entries will use lots of FPGA-ressources. Better use a dedicated SD-RAM here instead
 	);
@@ -45,9 +45,9 @@ entity aes50_ram is
 		
 		sync_out			: out std_logic
 	);
-end aes50_ram;
+end eth_ram;
 
-architecture Behavioral of aes50_ram is
+architecture Behavioral of eth_ram is
 	type t_ram is array(lastAddress downto 0) of std_logic_vector(7 downto 0);
 	signal ram: t_ram;
 begin
@@ -79,7 +79,8 @@ begin
 			else
 				sync_out <= '0';
 			end if;
-		
+
+			
 			-- write to RAM
 			if (writeAddr <= lastAddress) then
 				ram(to_integer(writeAddr)) <= data_in;

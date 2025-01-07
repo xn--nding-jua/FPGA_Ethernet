@@ -11,6 +11,9 @@ use ieee.std_logic_1164.all;
 use IEEE.NUMERIC_STD.ALL;
 
 entity ethernet_packet_parser is 
+	generic(
+		udp_port : integer := 4023
+	);
 	port
 	(
 		clk						: in std_logic;
@@ -53,8 +56,6 @@ architecture Behavioral of ethernet_packet_parser is
 
 	signal byte_counter			: integer range 0 to 1500 := 0;
 	
-	signal zsync_in				: std_logic;
-	
 	signal pkt_icmp_src_ip 		: std_logic_vector(31 downto 0);
 	signal pkt_icmp_dst_ip 		: std_logic_vector(31 downto 0);
 	signal pkt_icmp_type 		: std_logic_vector(7 downto 0);
@@ -64,15 +65,13 @@ begin
 	process (clk)
 	begin
 		if (rising_edge(clk)) then
-			-- sync_in comes from 25MHz domain when in 100Mbps mode, so we have to check for rising edge
-			zsync_in <= sync_in;
-			
-			if ((sync_in = '1') and (zsync_in = '0') and (s_SM_PacketParser = s_Idle)) then
+			if ((sync_in = '1') and (s_SM_PacketParser = s_Idle)) then
 				-- a new frame has arrived
 				byte_counter <= 0;
 				send_arp_response <= '0';
 				send_icmp_response <= '0';
-				
+				send_udp_response <= '0';
+
 				-- check packet type
 				if (pkt_type = x"0800") then
 					-- we received IP packet
@@ -118,20 +117,26 @@ begin
 				-- udp_dst_port
 				-- udp_length
 				
-				--if (byte_counter < (udp_length - 8)) then
-				if (byte_counter < 4) then -- just read the first 4 bytes
-					send_udp_response <= '1';
-				
-					--udp_payload((byte_counter + 1) * 8 - 1 downto (byte_counter * 8)) <= ram_data;
-					udp_payload(31 - (byte_counter * 8) downto 24 - (byte_counter * 8)) <= ram_data;
-					ram_read_address <= to_unsigned(43 + byte_counter, 11); -- load next payload-byte
-				elsif (byte_counter > 15) then
-					-- we've read the payload-data and finished the work
-					send_udp_response <= '0';
-					s_SM_PacketParser <= s_Done;
+				-- check if the destination-port is our desired port
+				if (udp_dst_port = udp_port) then
+					--if (byte_counter < (udp_length - 8)) then
+					if (byte_counter < 4) then -- just read the first 4 bytes
+						send_udp_response <= '1';
+					
+						--udp_payload((byte_counter + 1) * 8 - 1 downto (byte_counter * 8)) <= ram_data;
+						udp_payload(31 - (byte_counter * 8) downto 24 - (byte_counter * 8)) <= ram_data;
+						ram_read_address <= to_unsigned(43 + byte_counter, 11); -- load next payload-byte
+					else
+						-- we've read the payload-data and finished the work
+						send_udp_response <= '0';
+						s_SM_PacketParser <= s_Done;
+					end if;
+					
+					byte_counter <= byte_counter + 1;
+				else
+					-- unexpected destination-port
+					s_SM_PacketParser <= s_UnexpectedPacket;
 				end if;
-				
-				byte_counter <= byte_counter + 1;
 
 			elsif (s_SM_PacketParser = s_ProcessIcmpPacket) then
 				-- we have to load 4 bytes for source-ip, 4 bytes for destination-ip
@@ -171,9 +176,7 @@ begin
 						icmp_sequence <= pkt_icmp_sequence;
 						send_icmp_response <= '1';
 					end if;
-				elsif (byte_counter > 26) then
-					-- disable signal after 10 clocks = 125MHz / 10 = 12.5MHz
-				
+				else
 					send_icmp_response <= '0';
 					s_SM_PacketParser <= s_Done;
 				end if;
@@ -191,10 +194,8 @@ begin
 						-- rise arp-response-flag for 10 clocks = 125MHz / 10 = 12.5MHz
 						-- so that arp-sender can recognize this signal
 						send_arp_response <= '1';
-					elsif (byte_counter > 10) then
-						byte_counter <= 0;
+					else
 						send_arp_response <= '0';
-
 						s_SM_PacketParser <= s_Done;
 					end if;
 
@@ -217,11 +218,10 @@ begin
 			
 			elsif (s_SM_PacketParser = s_UnexpectedPacket) then
 				-- raise some errors or do other things here
-			
 				s_SM_PacketParser <= s_Idle;
 
 			elsif (s_SM_PacketParser = s_Done) then
-			
+				-- everything is done successfully
 				s_SM_PacketParser <= s_Idle;
 			
 			end if;

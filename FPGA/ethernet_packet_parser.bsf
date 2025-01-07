@@ -219,7 +219,13 @@ applicable agreement for further details.
 		(text "ram_read_address[10..0]" (rect 166 203 267 215)(font "Arial" ))
 		(line (pt 288 208)(pt 272 208)(line_width 3))
 	)
+	(parameter
+		"udp_port"
+		"4023"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
 	(drawing
 		(rectangle (rect 16 16 272 288)(line_width 1))
 	)
+	(annotation_block (parameter)(rect 304 -64 404 16))
 )

@@ -60,7 +60,7 @@ architecture Behavioral of udp_packet is
 	signal udp_calc_new_checksum		: std_logic := '0';
 
 	-- Other signals used in this file
-	type t_SM_Ethernet is (s_Idle, s_Start, s_Wait, s_Transmit, s_End);
+	type t_SM_Ethernet is (s_Idle, s_CalcChecksum, s_WaitChecksum, s_Start, s_Wait, s_Transmit, s_End);
 	signal s_SM_Ethernet					: t_SM_Ethernet := s_Idle;
 	signal byte_counter					: integer range 0 to 1600 := 0; -- one ethernet-frame cannot take more than 1500 bytes + header
 	signal packet_counter				: integer range 0 to 65535 := 1;
@@ -158,37 +158,40 @@ begin
 				udp_frame(57) <= x"32"; -- 2
 				udp_frame(58) <= x"33"; -- 3
 				udp_frame(59) <= x"34"; -- 4
-				
-				calc_new_checksum <= '1'; -- calculate new checksum
-				udp_calc_new_checksum <= '1'; -- calculate new checksum for udp packet
 
-				s_SM_Ethernet <= s_Start;
+				calc_new_checksum <= '1'; -- calculate new checksum for IP-HEADER
+				udp_calc_new_checksum <= '1'; -- calculate new checksum for udp packet
 				
-			elsif (s_SM_Ethernet = s_Start) then
+				s_SM_Ethernet <= s_CalcChecksum;
+				
+			elsif (s_SM_Ethernet = s_CalcChecksum) then
 				calc_new_checksum <= '0';
 				udp_calc_new_checksum <= '0';
 
+				s_SM_Ethernet <= s_WaitChecksum;
+			
+			elsif (s_SM_Ethernet = s_WaitChecksum) then
+				-- wait until both Checksums are calculated
+				if ((calculating_checksum = '0') and (udp_calculating_checksum = '0')) then
+					s_SM_Ethernet <= s_Start;
+				end if;
+				
+			elsif (s_SM_Ethernet = s_Start) then
 				-- wait until MAC is ready again
 				if (tx_busy = '0') then
+					udp_frame(MAC_HEADER_LENGTH + 10) <= std_logic_vector(checksum(15 downto 8)); -- MSB
+					udp_frame(MAC_HEADER_LENGTH + 11) <= std_logic_vector(checksum(7 downto 0)); -- LSB
+					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 6) <= std_logic_vector(udp_checksum(15 downto 8)); -- MSB
+					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 7) <= std_logic_vector(udp_checksum(7 downto 0)); -- LSB
+					
 					tx_enable <= '1';
 					byte_counter <= 0; -- preload to first byte again
 					tx_data <= udp_frame(0);
+
 					s_SM_Ethernet <= s_Transmit;
 				end if;
 			
 			elsif (s_SM_Ethernet = s_Transmit) then
-				-- insert CRC checksum into header when ready
-				if (calculating_checksum = '0') then
-					udp_frame(MAC_HEADER_LENGTH + 10) <= std_logic_vector(checksum(15 downto 8)); -- MSB
-					udp_frame(MAC_HEADER_LENGTH + 11) <= std_logic_vector(checksum(7 downto 0)); -- LSB
-				end if;
-
-				-- insert CRC checksum into header when ready
-				if (udp_calculating_checksum = '0') then
-					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 6) <= std_logic_vector(udp_checksum(15 downto 8)); -- MSB
-					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 7) <= std_logic_vector(udp_checksum(7 downto 0)); -- LSB
-				end if;
-
 				-- wait until previous byte is sent
 				if (tx_byte_sent = '1') then
 					-- send next byte and increment byte_counter

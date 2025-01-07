@@ -38,7 +38,7 @@ architecture Behavioral of icmp_packet is
 	constant ICMP_PAYLOAD_LENGTH	: integer := 32;
 	constant PACKET_LENGTH			: integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + ICMP_LENGTH + ICMP_PAYLOAD_LENGTH;
 
-	type t_SM_Ethernet is (s_Idle, s_Start, s_Wait, s_Transmit, s_End);
+	type t_SM_Ethernet is (s_Idle, s_CalcChecksum, s_WaitChecksum, s_Start, s_Wait, s_Transmit, s_End);
 	signal s_SM_Ethernet					: t_SM_Ethernet := s_Idle;
 	signal byte_counter					: integer range 0 to (PACKET_LENGTH + 1);
 	signal packet_counter				: integer range 0 to 65535 := 1;
@@ -168,14 +168,28 @@ begin
 				calc_new_checksum <= '1'; -- calculate new checksum for IP-HEADER
 				icmp_calc_new_checksum <= '1'; -- calculate new checksum for ICMP-Part
 
-				s_SM_Ethernet <= s_Start;
+				s_SM_Ethernet <= s_CalcChecksum;
 				
-			elsif (s_SM_Ethernet = s_Start) then
+			elsif (s_SM_Ethernet = s_CalcChecksum) then
 				calc_new_checksum <= '0';
 				icmp_calc_new_checksum <= '0';
+				
+				s_SM_Ethernet <= s_WaitChecksum;
 
+			elsif (s_SM_Ethernet = s_WaitChecksum) then
+				-- wait until CRC is calculated
+				if ((calculating_checksum = '0') and (icmp_calculating_checksum = '0')) then
+					s_SM_Ethernet <= s_Start;
+				end if;
+
+			elsif (s_SM_Ethernet = s_Start) then
 				-- wait until MAC is ready again
 				if (tx_busy = '0') then
+					icmp_frame(MAC_HEADER_LENGTH + 10) <= std_logic_vector(checksum(15 downto 8)); -- MSB
+					icmp_frame(MAC_HEADER_LENGTH + 11) <= std_logic_vector(checksum(7 downto 0)); -- LSB
+					icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 2) <= std_logic_vector(icmp_checksum(15 downto 8)); -- MSB
+					icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 3) <= std_logic_vector(icmp_checksum(7 downto 0)); -- LSB
+
 					tx_enable <= '1';
 					byte_counter <= 0; -- preload to first byte again
 					tx_data <= icmp_frame(0);
@@ -184,18 +198,6 @@ begin
 				end if;
 			
 			elsif (s_SM_Ethernet = s_Transmit) then
-				-- insert CRC checksum into header when ready
-				if (calculating_checksum = '0') then
-					icmp_frame(MAC_HEADER_LENGTH + 10) <= std_logic_vector(checksum(15 downto 8)); -- MSB
-					icmp_frame(MAC_HEADER_LENGTH + 11) <= std_logic_vector(checksum(7 downto 0)); -- LSB
-				end if;
-				
-				-- insert CRC checksum into ICMP-Packet when ready
-				if (icmp_calculating_checksum = '0') then
-					icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 2) <= std_logic_vector(icmp_checksum(15 downto 8)); -- MSB
-					icmp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 3) <= std_logic_vector(icmp_checksum(7 downto 0)); -- LSB
-				end if;
-
 				-- wait until previous byte is sent
 				if (tx_byte_sent = '1') then
 					-- send next byte and increment byte_counter

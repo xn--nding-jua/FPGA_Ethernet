@@ -14,9 +14,6 @@ FPGA/output_files/
 FPGA/*sim/
 FPGA/*testbench/
 build/
-PCB/History/
-PCB/Project Logs for AES50/
-PCB/Project Outputs for AES50/
 
 # Build results
 [Dd]ebug/

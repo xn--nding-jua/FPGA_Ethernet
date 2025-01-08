@@ -4,8 +4,7 @@
 -- Released under GNU General Public License v3
 -- Source: https://www.github.com/xn--nding-jua/AES50_Transmitter
 --
--- This file contains an ethernet-packet-generator to send individual bytes to a FIFO.
--- It generates the nescessary signals like TX-clock, TX-data, TX-EndOfPacket, etc.
+-- This file contains an ethernet-packet-generator to send individual bytes to an EthernetMAC directly.
 
 library ieee;
 use ieee.std_logic_1164.all;

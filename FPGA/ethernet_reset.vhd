@@ -95,8 +95,8 @@ begin
 				sendArpRequest <= '0';
 				
 				counter <= counter + 1;
-				-- wait 5 seconds
-				if (counter > 5000) then
+				-- wait 3 seconds
+				if (counter > 3000) then
 					counter <= 0;
 					s_SM_Ethernet <= s_Done;
 				end if;

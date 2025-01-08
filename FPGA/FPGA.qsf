@@ -239,6 +239,12 @@ set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PHY_MDIO
 set_location_assignment PIN_AB12 -to CLK25B2
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name VHDL_FILE eth_ram.vhd
+set_global_assignment -name VHDL_FILE ddfs_brom.vhd
+set_global_assignment -name VHDL_FILE ddfs_amplitude.vhd
+set_global_assignment -name VHDL_FILE PLL1.vhd
+set_global_assignment -name VHDL_FILE clk_by_x.vhd
+set_global_assignment -name VHDL_FILE udp_audio_packet.vhd
 set_global_assignment -name VHDL_FILE arp_packet.vhd
 set_global_assignment -name VHDL_FILE const_eth_speed.vhd
 set_global_assignment -name VHDL_FILE udp_packet.vhd
@@ -266,7 +272,6 @@ set_global_assignment -name VHDL_FILE RS232_Decoder.vhdl
 set_global_assignment -name BDF_FILE FPGA.bdf
 set_global_assignment -name QIP_FILE PLL2.qip
 set_global_assignment -name VHDL_FILE ethernet_receive.vhd
-set_global_assignment -name VHDL_FILE aes50_ram.vhd
 set_global_assignment -name VHDL_FILE ethernet_reset.vhd
 set_global_assignment -name VHDL_FILE detect_rising_edge.vhd
 set_global_assignment -name VHDL_FILE const_eth_config.vhd
@@ -274,4 +279,7 @@ set_global_assignment -name VHDL_FILE reverse_mac.vhd
 set_global_assignment -name VHDL_FILE ethernet_packet_aggregator.vhd
 set_global_assignment -name VHDL_FILE ethernet_packet_parser.vhd
 set_global_assignment -name VHDL_FILE icmp_packet.vhd
+set_global_assignment -name QIP_FILE const_ddfs_freq0.qip
+set_global_assignment -name QIP_FILE const_ddfs_freq1.qip
+set_global_assignment -name SDC_FILE FPGA.sdc
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

@@ -1,21 +1,16 @@
--- UDP Packet Sender
+-- UDP Audio Packet Sender
 -- (c) 2025 Dr.-Ing. Christian Noeding
 -- christian@noeding-online.de
 -- Released under GNU General Public License v3
 -- Source: https://www.github.com/xn--nding-jua/AES50_Transmitter
 --
 -- This file contains an ethernet-packet-generator to send individual bytes to an EthernetMAC directly.
---
--- when not using ARP, set ARP-entry in Windows manually using
--- netsh interface ipv4 add neighbors "Ethernet 1" 192.168.0.42 00-1c-23-17-4a-cb
--- To delete this entry, use the following command:
--- arp -d 192.168.0.42
 
 library ieee;
 use ieee.std_logic_1164.all;
 use IEEE.NUMERIC_STD.ALL;
 
-entity udp_packet is
+entity udp_audio_packet is
 	port
 	(
 		src_mac_address		: in std_logic_vector(47 downto 0);
@@ -24,23 +19,30 @@ entity udp_packet is
 		dst_ip_address			: in std_logic_vector(31 downto 0);
 		src_udp_port			: in std_logic_vector(15 downto 0);
 		dst_udp_port			: in std_logic_vector(15 downto 0);
-		frame_start				: in std_logic;
 		tx_clk					: in std_logic;
 		tx_busy					: in std_logic;
 		tx_byte_sent			: in std_logic;
+		audio_data_l			: in std_logic_vector(23 downto 0);
+		audio_data_r			: in std_logic_vector(23 downto 0);
+		audio_sync				: in std_logic;
 
 		tx_enable				: out std_logic := '0';  -- TX valid
 		tx_data					: out std_logic_vector(7 downto 0) := (others => '0') -- data-octet
 	);
 end entity;
 
-architecture Behavioral of udp_packet is
+architecture Behavioral of udp_audio_packet is
 	-- Constants
+	constant BUFFERED_AUDIO_SAMPLES	: integer := 64;
+	constant AUDIO_CHANNELS				: integer := 2;
+	constant BYTES_PER_SAMPLE			: integer := 4;
+	constant AUDIO_START_SIGNAL		: integer := 8;
+	
 	constant MAC_HEADER_LENGTH			: integer := 14;
 	constant IP_HEADER_LENGTH			: integer := 5 * (32 / 8); -- Header length always 20 bytes (5 * 32 bit words)
 	constant UDP_PSEUDO_HEADER_LENGTH: integer := 8;
 	constant UDP_HEADER_LENGTH			: integer := 8;
-	constant UDP_PAYLOAD_LENGTH		: integer := 18;
+	constant UDP_PAYLOAD_LENGTH		: integer := AUDIO_START_SIGNAL + BUFFERED_AUDIO_SAMPLES * 2 * 4; -- 64 samples of 2 audio-channels of 32 bits data = 512 byte
 	constant PACKET_LENGTH				: integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH;
 
 	-- Checksum calculation
@@ -52,7 +54,7 @@ architecture Behavioral of udp_packet is
 
 	signal udp_checksum					: unsigned(15 downto 0) := (others => '0');
 	signal udp_checksum_tmp				: unsigned(31 downto 0) := (others => '0');
-	signal udp_checksum_byte_count	: integer range 0 to UDP_PSEUDO_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH + 2;
+	signal udp_checksum_byte_count	: integer range 0 to UDP_PSEUDO_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH + 20; -- keep enough headroom
 	signal udp_calculating_checksum	: std_logic := '0';
 	signal udp_calc_new_checksum		: std_logic := '0';
 
@@ -64,22 +66,60 @@ architecture Behavioral of udp_packet is
 
 	type t_ethernet_frame is array (0 to PACKET_LENGTH - 1) of std_logic_vector(7 downto 0);
 	signal udp_frame		: t_ethernet_frame;
-
-	signal zframe_start	: std_logic;
-begin
+	
+	signal frame_start : std_logic := '0';
+	signal zaudio_sync : std_logic := '0';
+	signal audio_buffer_ptr : integer range 0 to PACKET_LENGTH + 20 := 0; -- keep some headroom
+begin         
 	process (tx_clk)
 		variable Word: std_logic_vector(15 downto 0);
-		variable udpWord: std_logic_vector(15 downto 0);
+		variable udpWord1: std_logic_vector(15 downto 0); -- process multiple words at once
+		variable udpWord2: std_logic_vector(15 downto 0); -- process multiple words at once
+		variable udpWord3: std_logic_vector(15 downto 0); -- process multiple words at once
 	begin
 		if (falling_edge(tx_clk)) then
-			zframe_start <= frame_start;
-
-			if ((frame_start = '1') and (zframe_start = '0') and (s_SM_Ethernet = s_Idle)) then
+			-- copy new audio-data only when we are not sending as we have no double-buffering
+			-- as audio is at 48kHz and we are sending at 25MHz, we should have enough time
+			-- rising edge on audio_sync is kept and event fired after state-machine is back in s_Idle
+			if (s_SM_Ethernet = s_Idle) then
+				zaudio_sync <= audio_sync;
+				if ((audio_sync = '1') and (zaudio_sync = '0')) then
+					-- rising edge of audio_sync -> read audio-data
+					if (audio_buffer_ptr < (PACKET_LENGTH - 16)) then -- < 538
+						-- increment buffer-pointer by 8 bytes
+						frame_start <= '0';
+						audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes in the UDP-payload-buffer
+					elsif (audio_buffer_ptr = (PACKET_LENGTH - 16)) then -- = 538
+						-- buffer-pointer has reached the last element
+						frame_start <= '1';
+						audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes in the UDP-payload-buffer
+					else
+						-- next buffer-pointer would be out of scope, so reset to first UDP-payload-byte
+						frame_start <= '0';
+						audio_buffer_ptr <= MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + AUDIO_START_SIGNAL; -- reset to first UDP-payload-position
+					end if;
+					
+					-- "audio_sample_counter" is increased for two samples
+					udp_frame(audio_buffer_ptr)     <= audio_data_l(23 downto 16); -- MSB of audiosample
+					udp_frame(audio_buffer_ptr + 1) <= audio_data_l(15 downto 8);
+					udp_frame(audio_buffer_ptr + 2) <= audio_data_l(7 downto 0);
+					udp_frame(audio_buffer_ptr + 3) <= x"00"; -- LSB of audiosample
+					udp_frame(audio_buffer_ptr + 4) <= audio_data_r(23 downto 16); -- MSB of audiosample
+					udp_frame(audio_buffer_ptr + 5) <= audio_data_r(15 downto 8);
+					udp_frame(audio_buffer_ptr + 6) <= audio_data_r(7 downto 0);
+					udp_frame(audio_buffer_ptr + 7) <= x"00"; -- LSB of audiosample
+				else
+					frame_start <= '0';
+				end if;
+			end if;
+		
+			-- send UDP-frames with stored audio-data
+			if ((frame_start = '1') and (s_SM_Ethernet = s_Idle)) then
 				-- prepare begin of packet
 				packet_counter <= packet_counter + 1; -- increment packet counter
 				tx_enable <= '0';
 				byte_counter <= 0;
-
+				
 				-- 7 preamble bytes + SFD will be added by Ethernet-MAC
 				
 				-- MAC HEADER (14 bytes)
@@ -126,7 +166,7 @@ begin
 				udp_frame(32) <= dst_ip_address(15 downto 8);
 				udp_frame(33) <= dst_ip_address(7 downto 0);
 				-- options | padding
-
+				
 				-- UDP HEADER (8 bytes)
 				udp_frame(34) <= src_udp_port(15 downto 8);
 				udp_frame(35) <= src_udp_port(7 downto 0);
@@ -137,34 +177,25 @@ begin
 				udp_frame(40) <= x"00"; -- checksum (0 is a valid CRC-value to ignore it)
 				udp_frame(41) <= x"00";
 
-				-- UDP PAYLOAD (18 bytes)
-				udp_frame(42) <= x"48"; -- H
-				udp_frame(43) <= x"45"; -- E
-				udp_frame(44) <= x"4c"; -- L
-				udp_frame(45) <= x"4c"; -- L
-				udp_frame(46) <= x"4f"; -- O
-				udp_frame(47) <= x"20"; --  
-				udp_frame(48) <= x"57"; -- W
-				udp_frame(49) <= x"4f"; -- O
-				udp_frame(50) <= x"52"; -- R
-				udp_frame(51) <= x"4c"; -- L
-				udp_frame(52) <= x"44"; -- D
-				udp_frame(53) <= x"21"; -- !
-				udp_frame(54) <= x"20"; --  
-				udp_frame(55) <= x"30"; -- 0
-				udp_frame(56) <= x"31"; -- 1
-				udp_frame(57) <= x"32"; -- 2
-				udp_frame(58) <= x"33"; -- 3
-				udp_frame(59) <= x"34"; -- 4
+				-- UDP PAYLOAD (8 + 64 * 2 * 4 bytes)
+				-- payload is set above
+				udp_frame(42) <= x"0f";
+				udp_frame(43) <= x"0f";
+				udp_frame(44) <= x"0f";
+				udp_frame(45) <= x"0f";
+				udp_frame(46) <= x"f0";
+				udp_frame(47) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8);--x"f0";
+				udp_frame(48) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);--x"f0";
+				udp_frame(49) <= x"42"; -- bits 7..6 = samplerate | bits 5..0 = channel count
 
 				checksum_tmp                <= (others => '0');
 				checksum_byte_count         <= 0;
 				calculating_checksum        <= '1';
-				
+
 				udp_checksum_tmp            <= to_unsigned(17 + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH, 32); -- 0x11 (protocol) + UDP-LENGTH (header+payload)
 				udp_checksum_byte_count     <= 0;
 				udp_calculating_checksum    <= '1';
-				
+
 				s_SM_Ethernet <= s_CalcChecksum;
 				
 			elsif (s_SM_Ethernet = s_CalcChecksum) then
@@ -182,12 +213,14 @@ begin
 						calculating_checksum    <= '0';
 					end if;
 				end if;
-
+			
 				-- calculate checksum for UDP-Payload
 				if (udp_checksum_byte_count < (UDP_PSEUDO_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH)) then
-					udpWord                     := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1);
-					udp_checksum_tmp            <= udp_checksum_tmp + resize(unsigned(udpWord), 32);
-					udp_checksum_byte_count     <= udp_checksum_byte_count + 2; -- we are reading two bytes at once
+					udpWord1                    := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1);
+					udpWord2                    := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 2) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1 + 2);
+					udpWord3                    := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 4) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1 + 4);
+					udp_checksum_tmp            <= udp_checksum_tmp + resize(unsigned(udpWord1), 32) + resize(unsigned(udpWord2), 32) + resize(unsigned(udpWord3), 32);
+					udp_checksum_byte_count     <= udp_checksum_byte_count + 6; -- we are reading 3*2 bytes at once
 				else
 					-- checksum is calculated -> make sure that we have only 2-byte checksum and add carryover above 16th bit to 16-bit checksum
 					if (udp_checksum_tmp(31 downto 16) > 0) then
@@ -198,7 +231,7 @@ begin
 						udp_calculating_checksum    <= '0';
 					end if;
 				end if;
-				
+
 				-- if both checksum are ready, go to next state
 				if ((calculating_checksum = '0') and (udp_calculating_checksum = '0')) then
 					s_SM_Ethernet <= s_Start;
@@ -211,7 +244,7 @@ begin
 					udp_frame(MAC_HEADER_LENGTH + 11) <= std_logic_vector(checksum(7 downto 0)); -- LSB
 					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 6) <= std_logic_vector(udp_checksum(15 downto 8)); -- MSB
 					udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH + 7) <= std_logic_vector(udp_checksum(7 downto 0)); -- LSB
-					
+
 					tx_enable <= '1';
 					byte_counter <= 0; -- preload to first byte again
 					tx_data <= udp_frame(0);

@@ -109,8 +109,8 @@ procedure Tmainform.udpserverUDPRead(AThread: TIdUDPListenerThread;
   const AData: TIdBytes; ABinding: TIdSocketHandle);
 var
   i, c:integer;
-  audioSample:array[0..audioChannels-1] of SmallInt;
-  audioData:array[0..audioChannels-1] of array[0..3] of byte;
+  //audioSample:array[0..audioChannels-1] of SmallInt;
+  //audioData:array[0..audioChannels-1] of array[0..3] of byte;
 begin
   // each UDP-message contains 64 audiosamples for left and right with 32 bit and
   // an 5-byte header 0x0f0f0f0ff0 followed by a 2-byte packet-counter and a
@@ -154,16 +154,23 @@ begin
       // first 8 bytes are for header
       for c:=0 to audioChannels-1 do
       begin
-        audioData[c][0] := AData[8 + i*8 + 0 + 4*c]; // bits 23..16 = MSB
-        audioData[c][1] := AData[8 + i*8 + 1 + 4*c]; // bits 15..8
-        audioData[c][2] := AData[8 + i*8 + 2 + 4*c]; // bits 7..0   = LSB
-        audioData[c][3] := AData[8 + i*8 + 3 + 4*c]; // spare bits
+{
+        // here is the detailed (but slow) solution to parse the Audio-Samples
+        // copy data into new array and cast it as SmallInt (16-bit Audio-Samples)
+        audioData[c][0] := AData[8 + i*8 + 0 + 4*c]; // spare bits = 0
+        audioData[c][1] := AData[8 + i*8 + 1 + 4*c]; // bits 7..0   = LSB
+        audioData[c][2] := AData[8 + i*8 + 2 + 4*c]; // bits 15..8
+        audioData[c][3] := AData[8 + i*8 + 3 + 4*c]; // bits 23..16 = MSB
 
         // put samples together (playback using TAudioOut only supports 16 bit, so we take the two MSB)
-        audioSample[c] := SmallInt((audioData[c][0] shl 8) + audioData[c][1]); // use audio-bits 23..8
+        audioSample[c] := SmallInt((audioData[c][3] shl 8) + audioData[c][2]); // use audio-bits 23..8
 
         // store into ringbuffer
         ringbuffer[c][ringbufferWritePointer] := audioSample[c];
+}
+        // this is the more efficient way:
+        // cast parts of incoming Byte-Array as SmallInt directly and put it into ringbuffer
+		ringbuffer[c][ringbufferWritePointer] := PSmallInt(@AData[8 + i*8 + 2 + 4*c])^; // just take 2 of 3 bytes. Maybe we can use dithering in a later version
       end;
 
       ringbufferWritePointer := ringbufferWritePointer + 1;
@@ -179,6 +186,9 @@ begin
         end;
       end;
     end;
+
+    // when using a ringbuffer with 32-bit, we could use a direct copy:
+    move(AData[8], ringbuffer[0][ringbufferWritePointer], );
 
     goodPackets := goodPackets + 1;
   end else

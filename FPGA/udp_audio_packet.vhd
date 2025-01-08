@@ -100,14 +100,14 @@ begin
 					end if;
 					
 					-- "audio_sample_counter" is increased for two samples
-					udp_frame(audio_buffer_ptr)     <= audio_data_l(23 downto 16); -- MSB of audiosample
-					udp_frame(audio_buffer_ptr + 1) <= audio_data_l(15 downto 8);
-					udp_frame(audio_buffer_ptr + 2) <= audio_data_l(7 downto 0);
-					udp_frame(audio_buffer_ptr + 3) <= x"00"; -- LSB of audiosample
-					udp_frame(audio_buffer_ptr + 4) <= audio_data_r(23 downto 16); -- MSB of audiosample
-					udp_frame(audio_buffer_ptr + 5) <= audio_data_r(15 downto 8);
-					udp_frame(audio_buffer_ptr + 6) <= audio_data_r(7 downto 0);
-					udp_frame(audio_buffer_ptr + 7) <= x"00"; -- LSB of audiosample
+					udp_frame(audio_buffer_ptr)     <= x"00"; -- LSB of audiosample
+					udp_frame(audio_buffer_ptr + 1) <= audio_data_l(7 downto 0);
+					udp_frame(audio_buffer_ptr + 2) <= audio_data_l(15 downto 8);
+					udp_frame(audio_buffer_ptr + 3) <= audio_data_l(23 downto 16); -- MSB of audiosample
+					udp_frame(audio_buffer_ptr + 4) <= x"00"; -- LSB of audiosample
+					udp_frame(audio_buffer_ptr + 5) <= audio_data_r(7 downto 0);
+					udp_frame(audio_buffer_ptr + 6) <= audio_data_r(15 downto 8);
+					udp_frame(audio_buffer_ptr + 7) <= audio_data_r(23 downto 16); -- MSB of audiosample
 				else
 					frame_start <= '0';
 				end if;

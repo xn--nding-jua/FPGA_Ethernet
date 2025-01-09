@@ -32,17 +32,22 @@ entity udp_audio_packet is
 end entity;
 
 architecture Behavioral of udp_audio_packet is
+	-- some general thoughts:
+	-- with a maximum payload of 1460bytes (= 365 4-byte-samples), we could use 32 channels with a buffer of 11 samples
+	-- when sending only 3 bytes per channel, we have a payload of 486 samples, which means we can transmit all 48 channels with a buffer of 10 samples
+
 	-- Constants
-	constant BUFFERED_AUDIO_SAMPLES	: integer := 64;
+	constant BUFFERED_AUDIO_SAMPLES	: integer := 16;
 	constant AUDIO_CHANNELS				: integer := 2;
 	constant BYTES_PER_SAMPLE			: integer := 4;
+	constant AUDIO_BUFFER_LENGTH		: integer := BUFFERED_AUDIO_SAMPLES * AUDIO_CHANNELS * BYTES_PER_SAMPLE;
 	constant AUDIO_START_SIGNAL		: integer := 8;
 	
 	constant MAC_HEADER_LENGTH			: integer := 14;
 	constant IP_HEADER_LENGTH			: integer := 5 * (32 / 8); -- Header length always 20 bytes (5 * 32 bit words)
 	constant UDP_PSEUDO_HEADER_LENGTH: integer := 8;
 	constant UDP_HEADER_LENGTH			: integer := 8;
-	constant UDP_PAYLOAD_LENGTH		: integer := AUDIO_START_SIGNAL + BUFFERED_AUDIO_SAMPLES * 2 * 4; -- 64 samples of 2 audio-channels of 32 bits data = 512 byte
+	constant UDP_PAYLOAD_LENGTH		: integer := AUDIO_START_SIGNAL + BUFFERED_AUDIO_SAMPLES * 2 * 4; -- 8 start-bytes + 64 samples of 2 audio-channels of 32 bits data (512 byte) = 520 bytes
 	constant PACKET_LENGTH				: integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH;
 
 	-- Checksum calculation
@@ -66,6 +71,8 @@ architecture Behavioral of udp_audio_packet is
 
 	type t_ethernet_frame is array (0 to PACKET_LENGTH - 1) of std_logic_vector(7 downto 0);
 	signal udp_frame		: t_ethernet_frame;
+	type t_sample_buffer is array (0 to AUDIO_BUFFER_LENGTH - 1) of std_logic_vector(7 downto 0);
+	signal sample_buffer		: t_sample_buffer;
 	
 	signal frame_start : std_logic := '0';
 	signal zaudio_sync : std_logic := '0';
@@ -73,48 +80,38 @@ architecture Behavioral of udp_audio_packet is
 begin         
 	process (tx_clk)
 		variable Word: std_logic_vector(15 downto 0);
-		variable udpWord1: std_logic_vector(15 downto 0); -- process multiple words at once
-		variable udpWord2: std_logic_vector(15 downto 0); -- process multiple words at once
-		variable udpWord3: std_logic_vector(15 downto 0); -- process multiple words at once
+		variable udpWord: std_logic_vector(15 downto 0); -- process multiple words at once
 	begin
 		if (falling_edge(tx_clk)) then
-			-- copy new audio-data only when we are not sending as we have no double-buffering
-			-- as audio is at 48kHz and we are sending at 25MHz, we should have enough time
-			-- rising edge on audio_sync is kept and event fired after state-machine is back in s_Idle
-			if (s_SM_Ethernet = s_Idle) then
-				zaudio_sync <= audio_sync;
-				if ((audio_sync = '1') and (zaudio_sync = '0')) then
-					-- rising edge of audio_sync -> read audio-data
-					if (audio_buffer_ptr < (PACKET_LENGTH - 16)) then -- < 538
-						-- increment buffer-pointer by 8 bytes
-						frame_start <= '0';
-						audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes in the UDP-payload-buffer
-					elsif (audio_buffer_ptr = (PACKET_LENGTH - 16)) then -- = 538
-						-- buffer-pointer has reached the last element
-						frame_start <= '1';
-						audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes in the UDP-payload-buffer
-					else
-						-- next buffer-pointer would be out of scope, so reset to first UDP-payload-byte
-						frame_start <= '0';
-						audio_buffer_ptr <= MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + AUDIO_START_SIGNAL; -- reset to first UDP-payload-position
-					end if;
-					
-					-- "audio_sample_counter" is increased for two samples
-					udp_frame(audio_buffer_ptr)     <= x"00"; -- LSB of audiosample
-					udp_frame(audio_buffer_ptr + 1) <= audio_data_l(7 downto 0);
-					udp_frame(audio_buffer_ptr + 2) <= audio_data_l(15 downto 8);
-					udp_frame(audio_buffer_ptr + 3) <= audio_data_l(23 downto 16); -- MSB of audiosample
-					udp_frame(audio_buffer_ptr + 4) <= x"00"; -- LSB of audiosample
-					udp_frame(audio_buffer_ptr + 5) <= audio_data_r(7 downto 0);
-					udp_frame(audio_buffer_ptr + 6) <= audio_data_r(15 downto 8);
-					udp_frame(audio_buffer_ptr + 7) <= audio_data_r(23 downto 16); -- MSB of audiosample
+			zaudio_sync <= audio_sync;
+			-- copy audio-data to buffer-array when we are receiving new samples (audio_sync)
+			if ((audio_sync = '1') and (zaudio_sync = '0')) then
+				-- rising edge of audio_sync -> read audio-data
+				if (audio_buffer_ptr < (AUDIO_BUFFER_LENGTH - (2 * AUDIO_CHANNELS * BYTES_PER_SAMPLE))) then
+					-- increment buffer-pointer by 8 bytes
+					audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes
+				elsif (audio_buffer_ptr = (AUDIO_BUFFER_LENGTH - (2 * AUDIO_CHANNELS * BYTES_PER_SAMPLE))) then
+					-- buffer-pointer has reached the last element
+					audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes
 				else
-					frame_start <= '0';
+					-- next buffer-pointer would be out of scope, so reset to first element
+					frame_start <= '1'; -- set flag to read buffer when state-machine enteres s_Idle again
+					audio_buffer_ptr <= 0; -- reset to first element
 				end if;
+				
+				sample_buffer(audio_buffer_ptr)     <= x"00"; -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 1) <= audio_data_l(7 downto 0);
+				sample_buffer(audio_buffer_ptr + 2) <= audio_data_l(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 3) <= audio_data_l(23 downto 16); -- MSB of audiosample
+				sample_buffer(audio_buffer_ptr + 4) <= x"00"; -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 5) <= audio_data_r(7 downto 0);
+				sample_buffer(audio_buffer_ptr + 6) <= audio_data_r(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 7) <= audio_data_r(23 downto 16); -- MSB of audiosample
 			end if;
 		
 			-- send UDP-frames with stored audio-data
 			if ((frame_start = '1') and (s_SM_Ethernet = s_Idle)) then
+				frame_start <= '0';
 				-- prepare begin of packet
 				packet_counter <= packet_counter + 1; -- increment packet counter
 				tx_enable <= '0';
@@ -179,14 +176,17 @@ begin
 
 				-- UDP PAYLOAD (8 + 64 * 2 * 4 bytes)
 				-- payload is set above
-				udp_frame(42) <= x"0f";
-				udp_frame(43) <= x"0f";
-				udp_frame(44) <= x"0f";
-				udp_frame(45) <= x"0f";
-				udp_frame(46) <= x"f0";
-				udp_frame(47) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8);--x"f0";
-				udp_frame(48) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);--x"f0";
-				udp_frame(49) <= x"42"; -- bits 7..6 = samplerate | bits 5..0 = channel count
+				udp_frame(42) <= x"4E"; -- N
+				udp_frame(43) <= x"44"; -- D
+				udp_frame(44) <= x"4E"; -- N
+				udp_frame(45) <= x"47"; -- G
+				udp_frame(46) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8);--x"f0";
+				udp_frame(47) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);--x"f0";
+				udp_frame(48) <= x"42"; -- bits 7..6 = samplerate | bits 5..0 = channel count
+				udp_frame(49) <= std_logic_vector(to_unsigned(BUFFERED_AUDIO_SAMPLES, 8)); -- samples per packet
+				for i in 0 to AUDIO_BUFFER_LENGTH - 1 loop
+					udp_frame(50 + i) <= sample_buffer(i); -- copy content of audio-buffer
+				end loop;
 
 				checksum_tmp                <= (others => '0');
 				checksum_byte_count         <= 0;
@@ -216,11 +216,9 @@ begin
 			
 				-- calculate checksum for UDP-Payload
 				if (udp_checksum_byte_count < (UDP_PSEUDO_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH)) then
-					udpWord1                    := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1);
-					udpWord2                    := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 2) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1 + 2);
-					udpWord3                    := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 4) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1 + 4);
-					udp_checksum_tmp            <= udp_checksum_tmp + resize(unsigned(udpWord1), 32) + resize(unsigned(udpWord2), 32) + resize(unsigned(udpWord3), 32);
-					udp_checksum_byte_count     <= udp_checksum_byte_count + 6; -- we are reading 3*2 bytes at once
+					udpWord                    := udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count) & udp_frame(MAC_HEADER_LENGTH + IP_HEADER_LENGTH - UDP_PSEUDO_HEADER_LENGTH + udp_checksum_byte_count + 1);
+					udp_checksum_tmp            <= udp_checksum_tmp + resize(unsigned(udpWord), 32);
+					udp_checksum_byte_count     <= udp_checksum_byte_count + 2; -- we are reading 3*2 bytes at once
 				else
 					-- checksum is calculated -> make sure that we have only 2-byte checksum and add carryover above 16th bit to 16-bit checksum
 					if (udp_checksum_tmp(31 downto 16) > 0) then

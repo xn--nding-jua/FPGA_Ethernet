@@ -70,7 +70,7 @@ BEGIN
 
 	LPM_CONSTANT_component : LPM_CONSTANT
 	GENERIC MAP (
-		lpm_cvalue => 100,
+		lpm_cvalue => 25,
 		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
 		lpm_type => "LPM_CONSTANT",
 		lpm_width => 8
@@ -91,11 +91,11 @@ END SYN;
 -- Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
 -- Retrieval info: PRIVATE: Radix NUMERIC "10"
 -- Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
--- Retrieval info: PRIVATE: Value NUMERIC "100"
+-- Retrieval info: PRIVATE: Value NUMERIC "25"
 -- Retrieval info: PRIVATE: nBit NUMERIC "8"
 -- Retrieval info: PRIVATE: new_diagram STRING "1"
 -- Retrieval info: LIBRARY: lpm lpm.lpm_components.all
--- Retrieval info: CONSTANT: LPM_CVALUE NUMERIC "100"
+-- Retrieval info: CONSTANT: LPM_CVALUE NUMERIC "25"
 -- Retrieval info: CONSTANT: LPM_HINT STRING "ENABLE_RUNTIME_MOD=NO"
 -- Retrieval info: CONSTANT: LPM_TYPE STRING "LPM_CONSTANT"
 -- Retrieval info: CONSTANT: LPM_WIDTH NUMERIC "8"
@@ -104,6 +104,6 @@ END SYN;
 -- Retrieval info: GEN_FILE: TYPE_NORMAL const_ddfs_freq1.vhd TRUE
 -- Retrieval info: GEN_FILE: TYPE_NORMAL const_ddfs_freq1.inc FALSE
 -- Retrieval info: GEN_FILE: TYPE_NORMAL const_ddfs_freq1.cmp TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL const_ddfs_freq1.bsf TRUE FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL const_ddfs_freq1.bsf TRUE
 -- Retrieval info: GEN_FILE: TYPE_NORMAL const_ddfs_freq1_inst.vhd FALSE
 -- Retrieval info: LIB_FILE: lpm

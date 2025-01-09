@@ -9,6 +9,8 @@ For this, the FPGA requests via the ARP-protocol the MAC-address of one single I
 
 If you like a more complex network-situation, a soft-core-process using C-language is recommended, but loosing several of the speed-benefits you have with this system.
 
+In the current state transmitting live-audio via UDP from the FPGA is working. A small GUI can record the multi-channel-audio to the harddisk:
+![alt text](Documentation/Images/GUI.jpg)
 
 # General things to get this up and running
 

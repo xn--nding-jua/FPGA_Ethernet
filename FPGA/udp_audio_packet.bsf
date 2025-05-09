@@ -4,7 +4,7 @@ editor if you plan to continue editing the block that represents it in
 the Block Editor! File corruption is VERY likely to occur.
 */
 /*
-Copyright (C) 1991-2014 Altera Corporation
+Copyright (C) 1991-2013 Altera Corporation
 Your use of Altera Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
@@ -20,9 +20,9 @@ applicable agreement for further details.
 */
 (header "symbol" (version "1.1"))
 (symbol
-	(rect 16 16 264 256)
+	(rect 16 16 264 480)
 	(text "udp_audio_packet" (rect 5 0 76 12)(font "Arial" ))
-	(text "inst" (rect 8 224 20 236)(font "Arial" ))
+	(text "inst" (rect 8 448 20 460)(font "Arial" ))
 	(port
 		(pt 0 32)
 		(input)
@@ -89,23 +89,121 @@ applicable agreement for further details.
 	(port
 		(pt 0 176)
 		(input)
-		(text "audio_data_l[23..0]" (rect 0 0 74 12)(font "Arial" ))
-		(text "audio_data_l[23..0]" (rect 21 171 95 183)(font "Arial" ))
+		(text "audio_ch0_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch0_in[23..0]" (rect 21 171 97 183)(font "Arial" ))
 		(line (pt 0 176)(pt 16 176)(line_width 3))
 	)
 	(port
 		(pt 0 192)
 		(input)
-		(text "audio_data_r[23..0]" (rect 0 0 76 12)(font "Arial" ))
-		(text "audio_data_r[23..0]" (rect 21 187 97 199)(font "Arial" ))
+		(text "audio_ch1_in[23..0]" (rect 0 0 75 12)(font "Arial" ))
+		(text "audio_ch1_in[23..0]" (rect 21 187 96 199)(font "Arial" ))
 		(line (pt 0 192)(pt 16 192)(line_width 3))
 	)
 	(port
 		(pt 0 208)
 		(input)
+		(text "audio_ch2_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch2_in[23..0]" (rect 21 203 97 215)(font "Arial" ))
+		(line (pt 0 208)(pt 16 208)(line_width 3))
+	)
+	(port
+		(pt 0 224)
+		(input)
+		(text "audio_ch3_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch3_in[23..0]" (rect 21 219 97 231)(font "Arial" ))
+		(line (pt 0 224)(pt 16 224)(line_width 3))
+	)
+	(port
+		(pt 0 240)
+		(input)
+		(text "audio_ch4_in[23..0]" (rect 0 0 77 12)(font "Arial" ))
+		(text "audio_ch4_in[23..0]" (rect 21 235 98 247)(font "Arial" ))
+		(line (pt 0 240)(pt 16 240)(line_width 3))
+	)
+	(port
+		(pt 0 256)
+		(input)
+		(text "audio_ch5_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch5_in[23..0]" (rect 21 251 97 263)(font "Arial" ))
+		(line (pt 0 256)(pt 16 256)(line_width 3))
+	)
+	(port
+		(pt 0 272)
+		(input)
+		(text "audio_ch6_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch6_in[23..0]" (rect 21 267 97 279)(font "Arial" ))
+		(line (pt 0 272)(pt 16 272)(line_width 3))
+	)
+	(port
+		(pt 0 288)
+		(input)
+		(text "audio_ch7_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch7_in[23..0]" (rect 21 283 97 295)(font "Arial" ))
+		(line (pt 0 288)(pt 16 288)(line_width 3))
+	)
+	(port
+		(pt 0 304)
+		(input)
+		(text "audio_ch8_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch8_in[23..0]" (rect 21 299 97 311)(font "Arial" ))
+		(line (pt 0 304)(pt 16 304)(line_width 3))
+	)
+	(port
+		(pt 0 320)
+		(input)
+		(text "audio_ch9_in[23..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "audio_ch9_in[23..0]" (rect 21 315 97 327)(font "Arial" ))
+		(line (pt 0 320)(pt 16 320)(line_width 3))
+	)
+	(port
+		(pt 0 336)
+		(input)
+		(text "audio_ch10_in[23..0]" (rect 0 0 80 12)(font "Arial" ))
+		(text "audio_ch10_in[23..0]" (rect 21 331 101 343)(font "Arial" ))
+		(line (pt 0 336)(pt 16 336)(line_width 3))
+	)
+	(port
+		(pt 0 352)
+		(input)
+		(text "audio_ch11_in[23..0]" (rect 0 0 79 12)(font "Arial" ))
+		(text "audio_ch11_in[23..0]" (rect 21 347 100 359)(font "Arial" ))
+		(line (pt 0 352)(pt 16 352)(line_width 3))
+	)
+	(port
+		(pt 0 368)
+		(input)
+		(text "audio_ch12_in[23..0]" (rect 0 0 80 12)(font "Arial" ))
+		(text "audio_ch12_in[23..0]" (rect 21 363 101 375)(font "Arial" ))
+		(line (pt 0 368)(pt 16 368)(line_width 3))
+	)
+	(port
+		(pt 0 384)
+		(input)
+		(text "audio_ch13_in[23..0]" (rect 0 0 80 12)(font "Arial" ))
+		(text "audio_ch13_in[23..0]" (rect 21 379 101 391)(font "Arial" ))
+		(line (pt 0 384)(pt 16 384)(line_width 3))
+	)
+	(port
+		(pt 0 400)
+		(input)
+		(text "audio_ch14_in[23..0]" (rect 0 0 81 12)(font "Arial" ))
+		(text "audio_ch14_in[23..0]" (rect 21 395 102 407)(font "Arial" ))
+		(line (pt 0 400)(pt 16 400)(line_width 3))
+	)
+	(port
+		(pt 0 416)
+		(input)
+		(text "audio_ch15_in[23..0]" (rect 0 0 80 12)(font "Arial" ))
+		(text "audio_ch15_in[23..0]" (rect 21 411 101 423)(font "Arial" ))
+		(line (pt 0 416)(pt 16 416)(line_width 3))
+	)
+	(port
+		(pt 0 432)
+		(input)
 		(text "audio_sync" (rect 0 0 46 12)(font "Arial" ))
-		(text "audio_sync" (rect 21 203 67 215)(font "Arial" ))
-		(line (pt 0 208)(pt 16 208)(line_width 1))
+		(text "audio_sync" (rect 21 427 67 439)(font "Arial" ))
+		(line (pt 0 432)(pt 16 432)(line_width 1))
 	)
 	(port
 		(pt 248 32)
@@ -122,6 +220,6 @@ applicable agreement for further details.
 		(line (pt 248 48)(pt 232 48)(line_width 3))
 	)
 	(drawing
-		(rectangle (rect 16 16 232 224)(line_width 1))
+		(rectangle (rect 16 16 232 448)(line_width 1))
 	)
 )

@@ -22,8 +22,22 @@ entity udp_audio_packet is
 		tx_clk					: in std_logic;
 		tx_busy					: in std_logic;
 		tx_byte_sent			: in std_logic;
-		audio_data_l			: in std_logic_vector(23 downto 0);
-		audio_data_r			: in std_logic_vector(23 downto 0);
+		audio_ch0_in			: in std_logic_vector(23 downto 0);
+		audio_ch1_in			: in std_logic_vector(23 downto 0);
+		audio_ch2_in			: in std_logic_vector(23 downto 0);
+		audio_ch3_in			: in std_logic_vector(23 downto 0);
+		audio_ch4_in			: in std_logic_vector(23 downto 0);
+		audio_ch5_in			: in std_logic_vector(23 downto 0);
+		audio_ch6_in			: in std_logic_vector(23 downto 0);
+		audio_ch7_in			: in std_logic_vector(23 downto 0);
+		audio_ch8_in			: in std_logic_vector(23 downto 0);
+		audio_ch9_in			: in std_logic_vector(23 downto 0);
+		audio_ch10_in			: in std_logic_vector(23 downto 0);
+		audio_ch11_in			: in std_logic_vector(23 downto 0);
+		audio_ch12_in			: in std_logic_vector(23 downto 0);
+		audio_ch13_in			: in std_logic_vector(23 downto 0);
+		audio_ch14_in			: in std_logic_vector(23 downto 0);
+		audio_ch15_in			: in std_logic_vector(23 downto 0);
 		audio_sync				: in std_logic;
 
 		tx_enable				: out std_logic := '0';  -- TX valid
@@ -37,17 +51,17 @@ architecture Behavioral of udp_audio_packet is
 	-- when sending only 3 bytes per channel, we have a payload of 486 samples, which means we can transmit all 48 channels with a buffer of 10 samples
 
 	-- Constants
-	constant BUFFERED_AUDIO_SAMPLES	: integer := 16;
-	constant AUDIO_CHANNELS				: integer := 2;
-	constant BYTES_PER_SAMPLE			: integer := 4;
-	constant AUDIO_BUFFER_LENGTH		: integer := BUFFERED_AUDIO_SAMPLES * AUDIO_CHANNELS * BYTES_PER_SAMPLE;
+	constant BUFFERED_AUDIO_SAMPLES	: integer := 16; -- keep limit of 1460 bytes per UDP-frame in mind
+	constant AUDIO_CHANNELS				: integer := 16; -- keep audio-channels factor of two if using 24-bit per sample. Otherwise we will get uneven byte-numbers due to 3-byte-samples
+	constant BYTES_PER_SAMPLE			: integer := 3; -- 2 (16-bit), 3 (24-bit) or 4 (32-bit)
 	constant AUDIO_START_SIGNAL		: integer := 8;
+	constant AUDIO_BUFFER_LENGTH		: integer := BUFFERED_AUDIO_SAMPLES * AUDIO_CHANNELS * BYTES_PER_SAMPLE;
 	
 	constant MAC_HEADER_LENGTH			: integer := 14;
 	constant IP_HEADER_LENGTH			: integer := 5 * (32 / 8); -- Header length always 20 bytes (5 * 32 bit words)
 	constant UDP_PSEUDO_HEADER_LENGTH: integer := 8;
 	constant UDP_HEADER_LENGTH			: integer := 8;
-	constant UDP_PAYLOAD_LENGTH		: integer := AUDIO_START_SIGNAL + BUFFERED_AUDIO_SAMPLES * 2 * 4; -- 8 start-bytes + 64 samples of 2 audio-channels of 32 bits data (512 byte) = 520 bytes
+	constant UDP_PAYLOAD_LENGTH		: integer := AUDIO_START_SIGNAL + AUDIO_BUFFER_LENGTH; -- 8 start-bytes + x bytes for audio
 	constant PACKET_LENGTH				: integer := MAC_HEADER_LENGTH + IP_HEADER_LENGTH + UDP_HEADER_LENGTH + UDP_PAYLOAD_LENGTH;
 
 	-- Checksum calculation
@@ -88,25 +102,80 @@ begin
 			if ((audio_sync = '1') and (zaudio_sync = '0')) then
 				-- rising edge of audio_sync -> read audio-data
 				if (audio_buffer_ptr < (AUDIO_BUFFER_LENGTH - (2 * AUDIO_CHANNELS * BYTES_PER_SAMPLE))) then
-					-- increment buffer-pointer by 8 bytes
-					audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes
+					-- increment buffer-pointer by x bytes (6 bytes for stereo 24bit)
+					audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * x bytes
 				elsif (audio_buffer_ptr = (AUDIO_BUFFER_LENGTH - (2 * AUDIO_CHANNELS * BYTES_PER_SAMPLE))) then
 					-- buffer-pointer has reached the last element
-					audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * 4 bytes
+					audio_buffer_ptr <= audio_buffer_ptr + (AUDIO_CHANNELS * BYTES_PER_SAMPLE); -- we are storing AUDIO_CHANNELS * x bytes
 				else
 					-- next buffer-pointer would be out of scope, so reset to first element
 					frame_start <= '1'; -- set flag to read buffer when state-machine enteres s_Idle again
 					audio_buffer_ptr <= 0; -- reset to first element
 				end if;
 				
-				sample_buffer(audio_buffer_ptr)     <= x"00"; -- LSB of audiosample
-				sample_buffer(audio_buffer_ptr + 1) <= audio_data_l(7 downto 0);
-				sample_buffer(audio_buffer_ptr + 2) <= audio_data_l(15 downto 8);
-				sample_buffer(audio_buffer_ptr + 3) <= audio_data_l(23 downto 16); -- MSB of audiosample
-				sample_buffer(audio_buffer_ptr + 4) <= x"00"; -- LSB of audiosample
-				sample_buffer(audio_buffer_ptr + 5) <= audio_data_r(7 downto 0);
-				sample_buffer(audio_buffer_ptr + 6) <= audio_data_r(15 downto 8);
-				sample_buffer(audio_buffer_ptr + 7) <= audio_data_r(23 downto 16); -- MSB of audiosample
+				sample_buffer(audio_buffer_ptr + 0) <= audio_ch0_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 1) <= audio_ch0_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 2) <= audio_ch0_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 3) <= audio_ch1_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 4) <= audio_ch1_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 5) <= audio_ch1_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 6) <= audio_ch2_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 7) <= audio_ch2_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 8) <= audio_ch2_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 9) <= audio_ch3_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 10) <= audio_ch3_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 11) <= audio_ch3_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 12) <= audio_ch4_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 13) <= audio_ch4_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 14) <= audio_ch4_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 15) <= audio_ch5_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 16) <= audio_ch5_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 17) <= audio_ch5_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 18) <= audio_ch6_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 19) <= audio_ch6_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 20) <= audio_ch6_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 21) <= audio_ch7_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 22) <= audio_ch7_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 23) <= audio_ch7_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 24) <= audio_ch8_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 25) <= audio_ch8_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 26) <= audio_ch8_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 27) <= audio_ch9_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 28) <= audio_ch9_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 29) <= audio_ch9_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 30) <= audio_ch10_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 31) <= audio_ch10_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 32) <= audio_ch10_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 33) <= audio_ch11_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 34) <= audio_ch11_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 35) <= audio_ch11_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 36) <= audio_ch12_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 37) <= audio_ch12_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 38) <= audio_ch12_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 39) <= audio_ch13_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 40) <= audio_ch13_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 41) <= audio_ch13_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 42) <= audio_ch14_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 43) <= audio_ch14_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 44) <= audio_ch14_in(23 downto 16); -- MSB of audiosample
+
+				sample_buffer(audio_buffer_ptr + 45) <= audio_ch15_in(7 downto 0); -- LSB of audiosample
+				sample_buffer(audio_buffer_ptr + 46) <= audio_ch15_in(15 downto 8);
+				sample_buffer(audio_buffer_ptr + 47) <= audio_ch15_in(23 downto 16); -- MSB of audiosample
 			end if;
 		
 			-- send UDP-frames with stored audio-data
@@ -174,7 +243,7 @@ begin
 				udp_frame(40) <= x"00"; -- checksum (0 is a valid CRC-value to ignore it)
 				udp_frame(41) <= x"00";
 
-				-- UDP PAYLOAD (8 + 64 * 2 * 4 bytes)
+				-- UDP PAYLOAD (8 + audiodata bytes)
 				-- payload is set above
 				udp_frame(42) <= x"4E"; -- N
 				udp_frame(43) <= x"44"; -- D

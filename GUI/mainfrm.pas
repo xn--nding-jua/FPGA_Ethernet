@@ -11,6 +11,17 @@ const
   audioChannels = 48;
 
 type
+  TByte3 = packed record
+    B1, B2, B3: Byte;
+  end;
+
+  PUnionInt24 = ^TUnionInt24;
+  TUnionInt24 = record
+    case Integer of
+      0: (Bytes: TByte3); // 24-bit value
+      1: (Audiosample: LongInt); // 32-bit value
+  end;
+
   Tmainform = class(TForm)
     udpserver: TIdUDPServer;
     Timer1: TTimer;
@@ -197,10 +208,10 @@ begin
       begin
         // here is the detailed (but slow) solution to parse the Audio-Samples
         // copy data into new array and cast it as SmallInt (16-bit Audio-Samples)
-        //audioData[c][0] := AData[8 + i*8 + 0 + 4*c]; // spare bits = 0
-        //audioData[c][1] := AData[8 + i*8 + 1 + 4*c]; // bits 7..0   = LSB
-        //audioData[c][2] := AData[8 + i*8 + 2 + 4*c]; // bits 15..8
-        //audioData[c][3] := AData[8 + i*8 + 3 + 4*c]; // bits 23..16 = MSB
+        //audioData[c][0] := 0; // we are receiving only 24-bit and filling up with 8 empty bits
+        //audioData[c][1] := AData[8 + i*8 + 0 + 3*c]; // bits 7..0   = LSB
+        //audioData[c][2] := AData[8 + i*8 + 1 + 3*c]; // bits 15..8
+        //audioData[c][3] := AData[8 + i*8 + 2 + 3*c]; // bits 23..16 = MSB
 
         // put samples together (playback using TAudioOut only supports 16 bit, so we take the two MSB)
         //audioSample[c] := SmallInt((audioData[c][3] shl 8) + audioData[c][2]); // use audio-bits 23..8
@@ -210,8 +221,9 @@ begin
 
         // this is the more efficient way:
         // cast parts of incoming Byte-Array as SmallInt directly and put it into ringbuffer
-        //ringbuffer[c][ringbufferWritePointer] := PSmallInt(@AData[8 + i*8 + 2 + 4*c])^; // just take 2 of 3 bytes. Maybe we can use dithering in a later version
-        ringbuffer[c][ringbufferWritePointer] := PInteger(@AData[8 + i*8 + 4*c])^; // copy 32 bit of audio-data into ring-buffer
+        //ringbuffer[c][ringbufferWritePointer] := PSmallInt(@AData[8 + i*8 + 2 + 3*c])^; // just take 2 of 3 bytes. Maybe we can use dithering in a later version
+        //ringbuffer[c][ringbufferWritePointer] := PInteger(@AData[8 + i*8 + 4*c])^; // copy 32 bit of audio-data into ring-buffer
+        ringbuffer[c][ringbufferWritePointer] := (PUnionInt24(@AData[8 + i*8 + 3*c])^.Audiosample and $00FFFFFF) shl 8;  // take 24 bit of audio-data, shift left by 8 bits and copy into 32 bit ring-buffer
 
         if ((ringbufferWritePointer = (audioBufferSize-1)) and recordAudio) then
         begin

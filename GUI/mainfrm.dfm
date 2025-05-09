@@ -1,6 +1,6 @@
 object mainform: Tmainform
-  Left = 1085
-  Top = 541
+  Left = 600
+  Top = 348
   BorderStyle = bsSingle
   Caption = 'UdpAudioTest'
   ClientHeight = 490

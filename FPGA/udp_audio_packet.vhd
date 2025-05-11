@@ -251,7 +251,7 @@ begin
 				udp_frame(45) <= x"47"; -- G
 				udp_frame(46) <= std_logic_vector(to_unsigned(packet_counter, 16))(15 downto 8);--x"f0";
 				udp_frame(47) <= std_logic_vector(to_unsigned(packet_counter, 16))(7 downto 0);--x"f0";
-				udp_frame(48) <= x"42"; -- bits 7..6 = samplerate | bits 5..0 = channel count
+				udp_frame(48) <= "01" & std_logic_vector(to_unsigned(AUDIO_CHANNELS, 6)); -- bits 7..6 = samplerate (00 = 44.1kHz, 01 = 48kHz, 10=96kHz, 11=192kHz) | bits 5..0 = channel count (0...63)
 				udp_frame(49) <= std_logic_vector(to_unsigned(BUFFERED_AUDIO_SAMPLES, 8)); -- samples per packet
 				for i in 0 to AUDIO_BUFFER_LENGTH - 1 loop
 					udp_frame(50 + i) <= sample_buffer(i); -- copy content of audio-buffer

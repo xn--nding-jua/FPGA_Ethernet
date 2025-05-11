@@ -15,7 +15,7 @@ begin
 	process(clk)     
     begin
 		if(rising_edge(clk)) then
-			ddfs_out	<= shift_left(resize(ddfs_in, 24), 15);
+			ddfs_out	<= shift_left(resize(ddfs_in, 24), 16);
 		end if;
     end process;
 end;

@@ -3140,14 +3140,14 @@ applicable agreement for further details.
 		(pt 248 32)
 		(output)
 		(text "tx_enable" (rect 0 0 47 12)(font "Arial" ))
-		(text "tx_enable" (rect 188 27 227 39)(font "Arial" ))
+		(text "tx_enable" (rect 188 27 235 39)(font "Arial" ))
 		(line (pt 248 32)(pt 232 32))
 	)
 	(port
 		(pt 248 48)
 		(output)
 		(text "tx_data[7..0]" (rect 0 0 62 12)(font "Arial" ))
-		(text "tx_data[7..0]" (rect 175 43 227 55)(font "Arial" ))
+		(text "tx_data[7..0]" (rect 175 43 237 55)(font "Arial" ))
 		(line (pt 248 48)(pt 232 48)(line_width 3))
 	)
 	(drawing
@@ -4031,26 +4031,6 @@ applicable agreement for further details.
 	(bus)
 )
 (connector
-	(pt 1512 1640)
-	(pt 1512 1416)
-	(bus)
-)
-(connector
-	(pt 1496 1656)
-	(pt 1496 1520)
-	(bus)
-)
-(connector
-	(text "clk_10MHz" (rect 1154 1400 1207 1412)(font "Arial" ))
-	(pt 1216 1416)
-	(pt 1144 1416)
-)
-(connector
-	(text "clk_10MHz" (rect 1154 1504 1207 1516)(font "Arial" ))
-	(pt 1216 1520)
-	(pt 1144 1520)
-)
-(connector
 	(text "clk_10MHz" (rect 858 1416 911 1428)(font "Arial" ))
 	(pt 848 1432)
 	(pt 920 1432)
@@ -4059,26 +4039,6 @@ applicable agreement for further details.
 	(text "clk_10MHz" (rect 858 1520 911 1532)(font "Arial" ))
 	(pt 848 1536)
 	(pt 920 1536)
-)
-(connector
-	(pt 1120 1432)
-	(pt 1216 1432)
-	(bus)
-)
-(connector
-	(pt 1424 1416)
-	(pt 1512 1416)
-	(bus)
-)
-(connector
-	(pt 1120 1536)
-	(pt 1216 1536)
-	(bus)
-)
-(connector
-	(pt 1424 1520)
-	(pt 1496 1520)
-	(bus)
 )
 (connector
 	(pt 824 1448)
@@ -4499,6 +4459,46 @@ applicable agreement for further details.
 (connector
 	(pt 2096 1896)
 	(pt 2144 1896)
+)
+(connector
+	(pt 1496 1656)
+	(pt 1496 1520)
+	(bus)
+)
+(connector
+	(pt 1496 1520)
+	(pt 1424 1520)
+	(bus)
+)
+(connector
+	(text "clk_10MHz" (rect 1154 1504 1207 1516)(font "Arial" ))
+	(pt 1144 1520)
+	(pt 1216 1520)
+)
+(connector
+	(pt 1120 1536)
+	(pt 1216 1536)
+	(bus)
+)
+(connector
+	(pt 1512 1640)
+	(pt 1512 1416)
+	(bus)
+)
+(connector
+	(pt 1512 1416)
+	(pt 1424 1416)
+	(bus)
+)
+(connector
+	(text "clk_10MHz" (rect 1154 1400 1207 1412)(font "Arial" ))
+	(pt 1144 1416)
+	(pt 1216 1416)
+)
+(connector
+	(pt 1120 1432)
+	(pt 1216 1432)
+	(bus)
 )
 (junction (pt 3704 512))
 (junction (pt 1976 816))
